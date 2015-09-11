@@ -21,10 +21,10 @@ This web app demonstrates the use of the Web Bluetooth API for controlling a toy
 * If you find any issues, please open a bug here on GitHub
 
 ## How to make contributions?
-Please read and follow the steps in the CONTRIBUTING.md
+Please read and follow the steps in the ../CONTRIBUTING.md
 
 ## License
-See LICENSE
+See ../LICENSE
 
 ## Google+
 Web Bluetooth Community on Google+: https://plus.google.com/communities/108953318610326025178
