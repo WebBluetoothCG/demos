@@ -177,7 +177,7 @@ limitations under the License.
           })
           .catch(handleError);
         });
-        engine.addEventListener('platinum-bluetooth-auto-write-error', handleError);
+        engineCharacteristic.addEventListener('platinum-bluetooth-auto-write-error', handleError);
 
         rudder.addEventListener('value-change', function() {
           progress.hidden = false;
@@ -187,7 +187,7 @@ limitations under the License.
           })
           .catch(handleError);
         });
-        rudder.addEventListener('platinum-bluetooth-auto-write-error', handleError);
+        rudderCharacteristic.addEventListener('platinum-bluetooth-auto-write-error', handleError);
 
         leftButton.addEventListener('click', function () {
           rudder.value = -100;
