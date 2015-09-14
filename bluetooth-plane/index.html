@@ -1,0 +1,207 @@
+<!doctype html>
+<!--
+Copyright 2015 Google Inc. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<html>
+  <head>
+    <title>Bluetooth Toy Plane</title>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+
+    <!-- Polymer components -->
+    <link rel="import" href="bower_components/paper-progress/paper-progress.html">
+    <link rel="import" href="bower_components/paper-slider/paper-slider.html">
+    <link rel="import" href="bower_components/paper-button/paper-button.html">
+    <link rel="import" href="bower_components/paper-card/paper-card.html">
+    <link rel="import" href="bower_components/paper-dialog/paper-dialog.html">
+    <link rel="import" href="bower_components/platinum-bluetooth/platinum-bluetooth-device.html">
+    <link rel="import" href="bower_components/platinum-bluetooth/platinum-bluetooth-characteristic.html">
+
+    <link rel="import" href="bower_components/paper-styles/color.html">
+    <link rel="stylesheet" href="bower_components/paper-styles/demo.css">
+
+    <style is="custom-style">
+      paper-progress {
+        width: 100%;
+      }
+      paper-progress.blue {
+        paper-progress-active-color: var(--paper-light-blue-500);
+        paper-progress-secondary-color: var(--paper-light-blue-100);
+      }
+      paper-slider {
+        width: 100%;
+      }
+      paper-slider.blue {
+        paper-slider-active-color: var(--paper-light-blue-500);
+        paper-slider-knob-color: var(--paper-light-blue-500);
+      }
+      paper-button {
+        display: block;
+        margin-bottom: 24px;
+      }
+      paper-button.colorful {
+        color: #4285f4;
+      }
+      paper-button[raised].colorful {
+        background: #4285f4;
+        color: #fff;
+      }
+      paper-button[toggles] {
+        transition: background-color 0.3s;
+      }
+      paper-button[toggles][active] {
+        background-color: rgba(0, 0, 0, 0.25);
+      }
+      paper-button[toggles][active].colorful {
+        background-color: rgba(66, 133, 244, 0.25);
+      }
+      paper-button[toggles][active][raised].colorful {
+        background-color: rgba(66, 133, 244, 0.75);
+      }
+      paper-button.blue {
+        color: var(--paper-light-blue-500);
+        paper-button-flat-focus-color: var(--paper-light-blue-50);
+      }
+      body {
+        background-color: var(--paper-grey-50);
+      }
+      #cards {
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 400px;
+      }
+      paper-card {
+        margin-bottom: 16px;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body unresolved>
+    <div id="cards">
+      <paper-card heading="Bluetooth Toy Plane">
+        <div class="card-content">
+          <paper-progress id="progress" indeterminate></paper-progress>
+        </div>
+      </paper-card>
+
+      <paper-card>
+        <div class="card-content">
+          <paper-button id="left" raised class="colorful">Left</paper-button>
+          <paper-button id="center" raised class="colorful">Center</paper-button>
+          <paper-button id="right" raised class="colorful">Right</paper-button>
+          <paper-button id="stop" raised class="colorful">Stop</paper-button>
+        </div>
+      </paper-card>
+
+      <paper-card>
+        <div class="card-content">
+          <div class="center horizontal layout">
+            <div>Engine</div>
+            <paper-slider id="engine" class="red" value="0" max="254" editable></paper-slider>
+          </div>
+        </div>
+      </paper-card>
+
+      <paper-card>
+        <div class="card-content">
+          <div class="center horizontal layout">
+            <div>Rudder</div>
+            <paper-slider id="rudder" class="red" value="0" min="-128" max="127" editable></paper-slider>
+          </div>
+        </div>
+      </paper-card>
+
+      <paper-dialog id="dialog">
+        <h2>Error</h2>
+        <p>Could not connect to bluetooth device!</p>
+      </paper-dialog>
+    </div>
+
+    <platinum-bluetooth-device services-filter='["f000ffc0-0451-4000-b000-000000000000"]' id="plane-device">
+      <platinum-bluetooth-characteristic id="engineCharacteristic"
+        service="75b64e51-f181-4ed1-921a-476090d80ba7"
+        characteristic="75b64e51-f184-4ed1-921a-476090d80ba7"
+        auto-write>
+      </platinum-bluetooth-characteristic>
+      <platinum-bluetooth-characteristic id="rudderCharacteristic"
+        service="75b64e51-f181-4ed1-921a-476090d80ba7"
+        characteristic="75b64e51-f185-4ed1-921a-476090d80ba7"
+        auto-write>
+      </platinum-bluetooth-characteristic>
+    </platinum-bluetooth-device>
+
+    <script>
+      document.addEventListener('WebComponentsReady', function() {
+        var progress = document.querySelector('#progress');
+        var dialog = document.querySelector('#dialog');
+        var engine = document.querySelector('#engine');
+        var rudder = document.querySelector('#rudder');
+        var leftButton = document.querySelector('#left');
+        var rightButton = document.querySelector('#right');
+        var centerButton = document.querySelector('#center');
+        var stopButton = document.querySelector('#stop');
+        var planeDevice = document.querySelector('#plane-device');
+        var engineCharacteristic = document.querySelector('#engineCharacteristic');
+        var rudderCharacteristic = document.querySelector('#rudderCharacteristic');
+        progress.hidden = true;
+
+        function handleError(error) {
+          console.log(error);
+          progress.hidden = true;
+          dialog.open();
+        }
+
+        engine.addEventListener('value-change', function() {
+          progress.hidden = false;
+          planeDevice.request().then(function() {
+            engineCharacteristic.value = new Uint8Array([engine.value]);
+            progress.hidden = true;
+          })
+          .catch(handleError);
+        });
+        engineCharacteristic.addEventListener('platinum-bluetooth-auto-write-error', handleError);
+
+        rudder.addEventListener('value-change', function() {
+          progress.hidden = false;
+          planeDevice.request().then(function() {
+            rudderCharacteristic.value = new Uint8Array([rudder.value]);
+            progress.hidden = true;
+          })
+          .catch(handleError);
+        });
+        rudderCharacteristic.addEventListener('platinum-bluetooth-auto-write-error', handleError);
+
+        leftButton.addEventListener('click', function () {
+          rudder.value = -100;
+        });
+        rightButton.addEventListener('click', function () {
+          rudder.value = 100;
+        });
+        centerButton.addEventListener('click', function () {
+          rudder.value = 0;
+        });
+        stopButton.addEventListener('click', function () {
+          engine.value = 0;
+        });
+      });
+    </script>
+  </body>
+</html>
