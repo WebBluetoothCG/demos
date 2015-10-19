@@ -1,6 +1,6 @@
 # Bluetooth Toy Plane Demo ft. Grumpy Cat
 
-Available at https://webbluetoothcg.github.io/demos/bluetooth-toy-plane
+Available at https://webbluetoothcg.github.io/demos/bluetooth-toy-plane/
 
 <img src="https://raw.githubusercontent.com/webbluetoothcg/demos/gh-pages/bluetooth-toy-plane/hero.gif">
 
