@@ -2,7 +2,7 @@
 
 Available at https://webbluetoothcg.github.io/demos/bluetooth-toy-plane
 
-<img src="https://raw.githubusercontent.com/webbluetoothcg/bluetooth-toy-plane/gh-pages/hero.gif">
+<img src="https://raw.githubusercontent.com/webbluetoothcg/demos/gh-pages/bluetooth-toy-plane/hero.gif">
 
 This web app demonstrates the use of the Web Bluetooth API for controlling a toy plane: https://www.youtube.com/watch?v=tRMcMDIyIGQ
 
