@@ -1,0 +1,31 @@
+#container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  background-color: #333333;
+  font-family: Roboto;
+}
+
+#statusText {
+  position: absolute;
+  bottom: 50%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  margin: 0 auto;
+  color: #fff;
+  font-size: 38px;
+  width: 128px;
+  overflow-x: visible;
+  cursor: default;
+  padding: 12px 0;
+  -webkit-user-select: none;
+}
+
+#waves {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
