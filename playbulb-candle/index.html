@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>PLAYBULB Candle Demo</title>
+    <link rel="icon" sizes="192x192" href="../favicon.png">
+    <link rel="manifest" href="manifest.json">
+
+    <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.4/material.green-light_green.min.css">
+    <script src="https://storage.googleapis.com/code.getmdl.io/1.0.4/material.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body id="state">
+    <div id="step1">
+      <div id="title">PLAYBULB CANDLE DEMO</div>
+      <button id="connect" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">CONNECT</button>
+    </div>
+
+    <div id="step2">
+      <canvas></canvas>
+      <input id="deviceName" type="text" maxLength="20">
+      <div id="buttons">
+      <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="noEffect">
+        <input type="radio" id="noEffect" name="effectSwitch" class="mdl-radio__button" checked/>
+        <span class="mdl-radio__label">No Effect</span>
+      </label>
+      <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="candleEffect">
+        <input type="radio" id="candleEffect" name="effectSwitch" class="mdl-radio__button"/>
+        <span class="mdl-radio__label">Candle Effect</span>
+      </label>
+      <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="flashing">
+        <input type="radio" id="flashing" name="effectSwitch" class="mdl-radio__button"/>
+        <span class="mdl-radio__label">Flashing</span>
+      </label>
+      <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="pulse">
+        <input type="radio" id="pulse" name="effectSwitch" class="mdl-radio__button"/>
+        <span class="mdl-radio__label">Pulse</span>
+      </label>
+      <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="rainbow">
+        <input type="radio" id="rainbow" name="effectSwitch" class="mdl-radio__button"/>
+        <span class="mdl-radio__label">Rainbow</span>
+      </label>
+      <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="rainbowFade">
+        <input type="radio" id="rainbowFade" name="effectSwitch" class="mdl-radio__button"/>
+        <span class="mdl-radio__label">Rainbow Fade</span>
+      </label>
+      </div>
+      <div id="batteryLevel"></div>
+    </div>
+    <div id="loading">
+      <div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div>
+    </div>
+
+    <script src="playbulbCandle.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

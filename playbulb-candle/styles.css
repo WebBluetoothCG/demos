@@ -1,0 +1,80 @@
+body {
+  margin: 0 auto;
+  background-color: #333;
+  max-width: 300px;
+  font-family: Roboto;
+  color: white;
+}
+canvas {
+  margin-top: 20px;
+  cursor: crosshair;
+}
+label {
+  display: block !important;
+  height: 28px !important;
+}
+body.connected #step1 {
+  display: none;
+}
+#step1 {
+  display: inherit;
+}
+body #step2 {
+  display: none;
+}
+body.connected #step2 {
+  display: inherit;
+}
+body.connecting #loading {
+  display: block;
+  text-align: center;
+  padding-top: 24px;
+}
+#title {
+  font-family: Roboto;
+  color: rgb(255, 255, 255);
+  font-size: 24px;
+  letter-spacing: -.02em;
+  text-align: center;
+  width: 100%;
+  padding: 12px 0;
+  padding-top: 340px;
+}
+#loading {
+  display: none;
+}
+#deviceName {
+  font-family: Roboto;
+  background: transparent;
+  border: 0;
+  color: rgb(255, 255, 255);
+  font-size: 24px;
+  letter-spacing: -.02em;
+  text-align: center;
+  width: 100%;
+  outline: none;
+  margin: 12px 0;
+}
+#batteryLevel {
+  background-color: #222222;
+  margin: 12px 0;
+  padding: 12px;
+  color: rgb(169, 169, 169);
+  border-radius: 4px;
+}
+#batteryLevel::before {
+  content: 'Battery: ';
+}
+#connect {
+  color: white;
+  background-color: #4CAF50;
+  width: 100%;
+  font-weight: bold;
+}
+#buttons {
+  background-color: #222222;
+  margin: 0 0 12px 0;
+  padding: 12px;
+  border-radius: 4px;
+  letter-spacing: -0.02em;
+}
