@@ -3,6 +3,7 @@
 - [Bluetooth Toy Plane](/bluetooth-toy-plane/)
 - [Heart Rate Sensor](/heart-rate-sensor/)
 - [PLAYBULB Candle](/playbulb-candle/)
+- [Bluetooth Printer](/bluetooth-printer/)
 
 ### Hosted Elsewhere
 
