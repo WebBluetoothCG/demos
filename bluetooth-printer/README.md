@@ -1,8 +1,10 @@
 # Web Bluetooth Printer
 
-This web app demonstrates the use of the Web Bluetooth API for printing to a BLE printer.
+Available at https://webbluetoothcg.github.io/demos/bluetooth-printer/
 
 <img src="https://raw.githubusercontent.com/webbluetoothcg/demos/gh-pages/bluetooth-printer/printer.jpg">
+
+This web app demonstrates the use of the Web Bluetooth API for printing to a BLE printer.
 
 ## Dependencies
 * Bluetooth printer: http://www.amazon.com/Version-AGPtek%C2%AE-Portable-Bluetooth-Wireless/dp/B00XL3DY2E
