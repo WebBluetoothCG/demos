@@ -1,0 +1,339 @@
+<!doctype html>
+<!--
+Copyright 2015 Google Inc. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<html>
+  <head>
+    <title>Bluetooth BB-8</title>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+
+    <!-- Polymer components -->
+    <link rel="import" href="bower_components/paper-progress/paper-progress.html">
+    <link rel="import" href="bower_components/paper-slider/paper-slider.html">
+    <link rel="import" href="bower_components/paper-button/paper-button.html">
+    <link rel="import" href="bower_components/paper-card/paper-card.html">
+    <link rel="import" href="bower_components/paper-dialog/paper-dialog.html">
+    <link rel="import" href="bower_components/paper-input/paper-input.html">
+    <link rel="import" href="bower_components/paper-input/paper-input-container.html">
+    <link rel="import" href="bower_components/paper-input/paper-input-error.html">
+    <link rel="import" href="bower_components/paper-input/paper-input-char-counter.html">
+    <link rel="import" href="bower_components/paper-toggle-button/paper-toggle-button.html">
+
+    <link rel="import" href="bower_components/paper-styles/color.html">
+    <link rel="stylesheet" href="bower_components/paper-styles/demo.css">
+
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="retro-joystick/scripts/retro-joystick.js"></script>
+
+    <link rel="stylesheet" href="retro-joystick/styles/retro-joystick.css" /-->
+
+    <style is="custom-style">
+      paper-progress {
+        width: 100%;
+      }
+      paper-progress.blue {
+        paper-progress-active-color: var(--paper-light-blue-500);
+        paper-progress-secondary-color: var(--paper-light-blue-100);
+      }
+      paper-slider {
+        width: 100%;
+      }
+      paper-slider.blue {
+        paper-slider-active-color: var(--paper-light-blue-500);
+        paper-slider-knob-color: var(--paper-light-blue-500);
+      }
+      paper-toggle-button.blue {
+        --paper-toggle-button-checked-bar-color:  var(--paper-light-blue-500);
+        --paper-toggle-button-checked-button-color:  var(--paper-light-blue-500);
+        --paper-toggle-button-checked-ink-color: var(--paper-light-blue-500);
+        --paper-toggle-button-unchecked-bar-color:  var(--paper-light-blue-900);
+        --paper-toggle-button-unchecked-button-color:  var(--paper-light-blue-900);
+        --paper-toggle-button-unchecked-ink-color: var(--paper-light-blue-900);
+      }
+      paper-button {
+        display: block;
+        margin-bottom: 2px;
+      }
+      paper-button.colorful {
+        color: #4285f4;
+      }
+      paper-button[raised].colorful {
+        background: #4285f4;
+        color: #fff;
+      }
+      paper-button.blue {
+        color: var(--paper-light-blue-500);
+        paper-button-flat-focus-color: var(--paper-light-blue-50);
+      }
+      body {
+        background-color: var(--paper-grey-50);
+      }
+      #cards {
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 400px;
+      }
+      paper-card {
+        margin-bottom: 5px;
+        margin-top: 5px;
+        width: 100%;
+      }
+      paper-card#logo {
+        @apply(--layout-vertical);
+        @apply(--layout-center);
+      }
+      paper-icon-button::shadow #icon {
+        width: 100px;
+        height: 100px;
+      }
+      #retrostick {
+       margin: auto;
+       float: none;
+      }
+    </style>
+  </head>
+  <body unresolved>
+    <template id="Toy" is="dom-bind">
+      <div id="cards">
+        <paper-card heading="Bluetooth BB-8">
+          <div class="card-content">
+            <paper-toggle-button class="blue" id="connect">Connect</paper-toggle-button>
+            <paper-progress id="progress" indeterminate></paper-progress>
+          </div>
+        </paper-card>
+
+        <paper-dialog id="dialog">
+          <h2>Error</h2>
+          <p>Could not connect to bluetooth device!</p>
+        </paper-dialog>
+      </div>
+
+      <div id="retrostick" class="retrostick">
+        <div class="retrostick-base">
+
+          <div class="retrostick-base-joint">
+              <div><div></div></div>
+          </div>
+
+          <span class="retrostick-dir-note retrostick-dir-forward-left">left</span>
+          <span class="retrostick-dir-note retrostick-dir-forward">forward</span>
+          <span class="retrostick-dir-note retrostick-dir-forward-right">right</span>
+
+          <div class="retrostick-stick-wrap">
+            <div class="retrostick-stick"></div>
+          </div>
+
+          <div class="retrostick-ball"></div>
+
+          <span class="retrostick-dir-note retrostick-dir-backward-left">left</span>
+          <span class="retrostick-dir-note retrostick-dir-backward">backward</span>
+          <span class="retrostick-dir-note retrostick-dir-backward-right">right</span>
+
+        </div>
+      </div>
+    </template>
+
+    <script>
+      'use strict';
+      document.addEventListener('WebComponentsReady', () => {
+        let connectToggle = document.querySelector('#connect');
+        let progress = document.querySelector('#progress');
+        let dialog = document.querySelector('#dialog');
+        let message = document.querySelector('#message');
+        let logo = document.querySelector('#logo');
+        let gattServer;
+        let radioService;
+        let robotService;
+        let controlCharacteristic;
+        let sequence = 0;
+        let heading = 0;
+        let busy = false;
+        progress.hidden = true;
+
+        function handleError(error) {
+          console.log(error);
+          progress.hidden = true;
+          gattServer = null;
+          radioService = null;
+          robotService = null;
+          controlCharacteristic = null;
+          dialog.open();
+        }
+
+        function sendCommand(did, cid, data) {
+          // Create client command packets
+          // API docs: https://github.com/orbotix/DeveloperResources/blob/master/docs/Sphero_API_1.50.pdf
+          // Next sequence number
+          let seq = sequence & 255;
+          sequence += 1
+          // Start of packet #2
+          let sop2 = 0xfc;
+          sop2 |= 1; // Answer
+          sop2 |= 2; // Reset timeout
+          // Data length
+          let dlen = data.byteLength + 1;
+          let sum = data.reduce((a, b) => {
+            return a + b;
+          });
+          // Checksum
+          let chk = (sum + did + cid + seq + dlen) & 255;
+          chk ^= 255;
+          let checksum = new Uint8Array([chk]);
+
+          let packets = new Uint8Array([0xff, sop2, did, cid, seq, dlen]);
+          // Append arrays: packet + data + checksum
+          let array = new Uint8Array(packets.byteLength + data.byteLength + checksum.byteLength);
+          array.set(packets, 0);
+          array.set(data, packets.byteLength);
+          array.set(checksum, packets.byteLength + data.byteLength);
+          return controlCharacteristic.writeValue(array).then(() => {
+            console.log('Command write done.');
+          });
+        }
+
+        function setColor(r, g, b) {
+          console.log('Set color: r='+r+',g='+g+',b='+b);
+          if (busy) {
+            // Return if another operation pending
+            return Promise.resolve();
+          }
+          busy = true;
+          let did = 0x02; // Virtual device ID
+          let cid = 0x20; // Set RGB LED Output command
+          // Color command data: red, green, blue, flag
+          let data = new Uint8Array([r, g, b, 0]);
+
+          sendCommand(did, cid, data).then(() => {
+            busy = false;
+          })
+          .catch(handleError);
+        }
+
+        function roll(heading) {
+          console.log('Roll heading='+heading);
+          if (busy) {
+            // Return if another operation pending
+            return Promise.resolve();
+          }
+          busy = true;
+          let did = 0x02; // Virtual device ID
+          let cid = 0x30; // Roll command
+          // Roll command data: speed, heading (MSB), heading (LSB), state
+          let data = new Uint8Array([10, heading >> 8, heading & 0xFF, 1]);
+
+          sendCommand(did, cid, data).then(() => {
+            busy = false;
+          })
+          .catch(handleError);
+        }
+
+        connectToggle.addEventListener('click', () => {
+          progress.hidden = false;
+          // Can only send commands once device is in developer mode.
+          // Put device into developer mode by sending a special string to Anti DOS,
+          // 7 to TX Power and 1 to Wake CPU on radio service.
+          if (controlCharacteristic == null) {
+            navigator.bluetooth.requestDevice({
+              filters: [{
+                services: ['22bb746f-2bb0-7554-2d6f-726568705327']
+              }]
+            })
+            .then(device => {
+              console.log('> Found ' + device.name);
+              console.log('Connecting to GATT Server...');
+              return device.connectGATT();
+            })
+            .then(server => {
+              gattServer = server;
+              // Get radio service
+              return gattServer.getPrimaryService("22bb746f-2bb0-7554-2d6f-726568705327");
+            })
+            .then(service => {
+              // Developer mode sequence is sent to the radio service
+              radioService = service;
+              // Get Anti DOS characteristic
+              return radioService.getCharacteristic("22bb746f-2bbd-7554-2d6f-726568705327");
+            })
+            .then(characteristic => {
+              console.log('> Found Anti DOS characteristic');
+              // Send special string
+              let bytes = new Uint8Array('011i3'.split('').map(c => c.charCodeAt()));
+              return characteristic.writeValue(bytes).then(() => {
+                console.log('Anti DOS write done.');
+              })
+            })
+            .then(() => {
+              // Get TX Power characteristic
+              return radioService.getCharacteristic("22bb746f-2bb2-7554-2d6f-726568705327");
+            })
+            .then(characteristic => {
+              console.log('> Found TX Power characteristic');
+              let array = new Uint8Array([0x07]);
+              return characteristic.writeValue(array).then(() => {
+                console.log('TX Power write done.');
+              })
+            })
+            .then(() => {
+              // Get Wake CPU characteristic
+              return radioService.getCharacteristic("22bb746f-2bbf-7554-2d6f-726568705327");
+            })
+            .then(characteristic => {
+              console.log('> Found Wake CPU characteristic');
+              let array = new Uint8Array([0x01]);
+              return characteristic.writeValue(array).then(() => {
+                console.log('Wake CPU write done.');
+              })
+            })
+            .then(() => {
+              // Get robot service
+              return gattServer.getPrimaryService("22bb746f-2ba0-7554-2d6f-726568705327")
+            })
+            .then(service => {
+              // Commands are sent to the robot service
+              robotService = service;
+              // Get Control characteristic
+              return robotService.getCharacteristic("22bb746f-2ba1-7554-2d6f-726568705327");
+            })
+            .then(characteristic => {
+              console.log('> Found Control characteristic');
+              // Cache the characteristic
+              controlCharacteristic = characteristic;
+              progress.hidden = true;
+              return setColor(0, 250, 0);
+            })
+            .catch(handleError);
+          } else {
+            progress.hidden = true;
+            setColor(0, 250, 0);
+          }
+        });
+
+        let joystick = new RetroJoyStick({
+          retroStickElement: document.querySelector('#retrostick')
+        });
+        joystick.subscribe('change', stick => {
+          roll(stick.angle);
+        });
+      });
+    </script>
+  </body>
+</html>
