@@ -1,4 +1,4 @@
-(() => {
+(function() {
   'use strict';
 
   let encoder = new TextEncoder('utf-8');
