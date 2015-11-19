@@ -4,6 +4,7 @@
 - [Heart Rate Sensor](/heart-rate-sensor/)
 - [PLAYBULB Candle](/playbulb-candle/)
 - [Bluetooth Printer](/bluetooth-printer/)
+- [Bluetooth Toy BB-8](/bluetooth-toy-bb8/)
 
 ### Hosted Elsewhere
 
