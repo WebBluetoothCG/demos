@@ -1,8 +1,10 @@
 # Web Bluetooth BB-8
 
-This web app demonstrates the use of the Web Bluetooth API for controlling a bluetooth toy version of the BB-8 droid.
+Available at https://webbluetoothcg.github.io/demos/bluetooth-toy-bb8/
 
 <img src="https://raw.githubusercontent.com/webbluetoothcg/demos/gh-pages/bluetooth-toy-bb8/bb8.jpg">
+
+This web app demonstrates the use of the Web Bluetooth API for controlling a bluetooth toy version of the BB-8 droid.
 
 Joystick code based on: https://github.com/debugish/retro-joystick
 
