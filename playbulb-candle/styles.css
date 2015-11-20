@@ -78,3 +78,11 @@ body.connecting #loading {
   border-radius: 4px;
   letter-spacing: -0.02em;
 }
+.no-bluetooth-card-square.mdl-card {
+  width: 320px;
+  height: 160px;
+}
+.no-bluetooth-card-square > .mdl-card__title {
+  color: #fff;
+  background: #c33;
+}

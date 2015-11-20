@@ -109,3 +109,15 @@ function onColorChanged(rgb) {
   }
 }
 
+window.onload = function() {
+  var connect = document.getElementById("connect");
+  var no_bt = document.getElementById("no-bluetooth");
+  if (navigator.bluetooth == undefined) {
+    console.log("No navigator.bluetooth found.");
+    connect.style.display = "none";
+    no_bt.style.display = "block";
+  } else {
+    connect.style.display = "block";
+    no_bt.style.display = "none";
+  }
+};
