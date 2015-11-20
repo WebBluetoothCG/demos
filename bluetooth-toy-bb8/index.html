@@ -121,6 +121,12 @@ limitations under the License.
           </div>
         </paper-card>
 
+        <paper-dialog id="no-bluetooth">
+          <h2>No Web Bluetooth</h2>
+          <p>The Web Bluetooth API is missing. Please enable it at
+          chrome://flags/#enable-web-bluetooth and try again.</p>
+        </paper-dialog>
+
         <paper-dialog id="dialog">
           <h2>Error</h2>
           <p>Could not connect to bluetooth device!</p>
@@ -168,6 +174,10 @@ limitations under the License.
         let heading = 0;
         let busy = false;
         progress.hidden = true;
+
+        if (navigator.bluetooth == undefined) {
+          document.getElementById("no-bluetooth").style.display = "block";
+        }
 
         function handleError(error) {
           console.log(error);
