@@ -79,8 +79,8 @@ body.connecting #loading {
   letter-spacing: -0.02em;
 }
 .no-bluetooth-card-square.mdl-card {
-  width: 320px;
-  height: 160px;
+  width: 100%;
+  min-height: 160px !important;
 }
 .no-bluetooth-card-square > .mdl-card__title {
   color: #fff;
