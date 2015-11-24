@@ -70,6 +70,7 @@ body.connecting #loading {
   background-color: #4CAF50;
   width: 100%;
   font-weight: bold;
+  display: none;
 }
 #buttons {
   background-color: #222222;
@@ -77,6 +78,9 @@ body.connecting #loading {
   padding: 12px;
   border-radius: 4px;
   letter-spacing: -0.02em;
+}
+#no_bluetooth {
+  display: none;
 }
 .no-bluetooth-card-square.mdl-card {
   width: 100%;
