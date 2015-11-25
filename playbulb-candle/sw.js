@@ -1,3 +1,5 @@
+// Version 2
+
 self.addEventListener('install', function(e) {
   e.waitUntil(
     caches.open('playbulb-candle').then(function(cache) {
