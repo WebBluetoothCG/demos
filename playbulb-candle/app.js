@@ -127,4 +127,5 @@ window.onload = function() {
     connect.style.display = "block";
     no_bt.style.display = "none";
   }
+  screen.orientation.lock('portrait').catch(e => e);
 };
