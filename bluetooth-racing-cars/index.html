@@ -1,0 +1,511 @@
+<!doctype html>
+<!--
+Copyright 2015 Google Inc. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<html>
+  <head>
+    <title>Racing Cars</title>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+
+    <!-- Polymer components -->
+    <link rel="import" href="bower_components/paper-progress/paper-progress.html">
+    <link rel="import" href="bower_components/paper-slider/paper-slider.html">
+    <link rel="import" href="bower_components/paper-button/paper-button.html">
+    <link rel="import" href="bower_components/paper-card/paper-card.html">
+    <link rel="import" href="bower_components/paper-dialog/paper-dialog.html">
+    <link rel="import" href="bower_components/paper-toggle-button/paper-toggle-button.html">
+
+    <link rel="import" href="bower_components/paper-styles/color.html">
+    <link rel="stylesheet" href="bower_components/paper-styles/demo.css">
+
+    <style is="custom-style">
+      paper-progress {
+        width: 100%;
+      }
+      paper-progress.blue {
+        paper-progress-active-color: var(--paper-light-blue-500);
+        paper-progress-secondary-color: var(--paper-light-blue-100);
+      }
+      paper-slider {
+        width: 100%;
+      }
+      paper-slider.blue {
+        paper-slider-active-color: var(--paper-light-blue-500);
+        paper-slider-knob-color: var(--paper-light-blue-500);
+      }
+      paper-toggle-button.blue {
+        --paper-toggle-button-checked-bar-color:  var(--paper-light-blue-500);
+        --paper-toggle-button-checked-button-color:  var(--paper-light-blue-500);
+        --paper-toggle-button-checked-ink-color: var(--paper-light-blue-500);
+        --paper-toggle-button-unchecked-bar-color:  var(--paper-light-blue-900);
+        --paper-toggle-button-unchecked-button-color:  var(--paper-light-blue-900);
+        --paper-toggle-button-unchecked-ink-color: var(--paper-light-blue-900);
+      }
+      paper-button {
+        display: block;
+        margin-bottom: 2px;
+      }
+      paper-button.colorful {
+        color: #4285f4;
+      }
+      paper-button[raised].colorful {
+        background: #4285f4;
+        color: #fff;
+      }
+      paper-button.blue {
+        color: var(--paper-light-blue-500);
+        paper-button-flat-focus-color: var(--paper-light-blue-50);
+      }
+      body {
+        background-color: var(--paper-grey-50);
+      }
+      #cards {
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 400px;
+      }
+      paper-card {
+        margin-bottom: 5px;
+        margin-top: 5px;
+        width: 100%;
+      }
+      paper-card#logo {
+        @apply(--layout-vertical);
+        @apply(--layout-center);
+      }
+      paper-icon-button::shadow #icon {
+        width: 100px;
+        height: 100px;
+      }
+    </style>
+  </head>
+  <body unresolved>
+    <template id="Toy" is="dom-bind">
+      <div id="cards">
+        <paper-card heading="Racing Cars">
+          <div class="card-content">
+            <paper-toggle-button class="blue" id="connect">Connect</paper-toggle-button>
+            <paper-progress id="progress" indeterminate></paper-progress>
+          </div>
+        </paper-card>
+
+        <paper-card id="logo">
+          <div class="card-content">
+            <image id="image" src="car.jpg" width="200px"></image>
+          </div>
+        </paper-card>
+
+        <paper-card>
+          <div class="card-content">
+            <paper-button id="lights" raised class="colorful">Lights</paper-button>
+            <paper-button id="lightsPattern" raised class="colorful">Lights Pattern</paper-button>
+          </div>
+        </paper-card>
+
+        <paper-card>
+          <div class="card-content">
+            <paper-button id="start" raised class="colorful">Start</paper-button>
+            <paper-button id="stop" raised class="colorful">Stop</paper-button>
+            <paper-button id="changeLaneRight" raised class="colorful">Change Lane Right</paper-button>
+            <paper-button id="changeLaneLeft" raised class="colorful">Change Lane Left</paper-button>
+          </div>
+        </paper-card>
+
+        <paper-dialog id="no-bluetooth">
+          <h2>No Web Bluetooth</h2>
+          <p>The Web Bluetooth API is missing. Please enable it at
+          chrome://flags/#enable-web-bluetooth and try again.</p>
+        </paper-dialog>
+
+        <paper-dialog id="dialog">
+          <h2>Error</h2>
+          <p>Could not connect to bluetooth device!</p>
+        </paper-dialog>
+      </div>
+    </template>
+
+    <script>
+      'use strict';
+      document.addEventListener('WebComponentsReady', () => {
+        let connectToggle = document.querySelector('#connect');
+        let progress = document.querySelector('#progress');
+        let dialog = document.querySelector('#dialog');
+        let lightsButton = document.querySelector('#lights');
+        let lightsPatternButton = document.querySelector('#lightsPattern');
+        let startButton = document.querySelector('#start');
+        let stopButton = document.querySelector('#stop');
+        let changeLaneLeftButton = document.querySelector('#changeLaneLeft');
+        let changeLaneRightButton = document.querySelector('#changeLaneRight');
+        let gattServer;
+        let driveService;
+        let writeCharacteristic;
+        let readCharacteristic;
+        let busy = false;
+        let lightsOn = false;
+        progress.hidden = true;
+
+        /**
+         * Check if browser supports Web Bluetooth API.
+         */
+        if (navigator.bluetooth == undefined) {
+          document.getElementById("no-bluetooth").style.display = "block";
+          document.getElementById("no-bluetooth").open();
+        }
+
+        /**
+         * Reset the app variable states.
+         */
+        function resetVariables() {
+          busy = false;
+          lightsOn = false;
+          progress.hidden = true;
+          gattServer = null;
+          driveService = null;
+          writeCharacteristic = null;
+          readCharacteristic = null;
+        }
+
+        /**
+         * API error handler.
+         */
+        function handleError(error) {
+          console.log(error);
+          resetVariables();
+          dialog.open();
+        }
+
+        /**
+         * Utility function to read a short value from bytes.
+         *
+         * @param bytes The data containing the values.
+         * @param offset The data offset within bytes.
+         * @return short The data value.
+         */
+        function readShort(bytes, offset) {
+          return ((bytes[offset + 1] & 0xff) << 8) | (bytes[offset] & 0xff);
+        }
+
+        /**
+         * Utility function to convert a float value to int bits representation.
+         *
+         * @param value The float value.
+         * @return short The int value
+         */
+        function floatToIntBits(value) {
+          let view = new DataView(new ArrayBuffer(4));
+          view.setFloat32(0, value);
+          return view.getInt32(0);
+        }
+
+        /**
+         * Send a command to the car device.
+         * Anki Drive SDK: https://github.com/anki/drive-sdk
+         *
+         * @param bytes The data containing the values.
+         * @param offset The data offset within bytes.
+         * @return short The data value.
+         */
+        function sendCommand(cmd) {
+          if (writeCharacteristic) {
+            // Handle one command at a time
+            if (busy) {
+              // Return if another operation pending
+              return Promise.resolve();
+            }
+            busy = true;
+
+            return writeCharacteristic.writeValue(cmd).then(() => {
+              busy = false;
+            });
+          } else {
+            return Promise.resolve();
+          }
+        }
+
+        /**
+         * Set the device into SDK mode.
+         */
+        function setSdkMode() {
+          console.log('Set SDK mode');
+          let cmd = new Uint8Array([0x3, 0x90, 0x01, 0x01]);
+
+          sendCommand(cmd).then(() => {
+            console.log('SDK mode set.');
+            getVersion();
+          })
+          .catch(handleError);
+        }
+
+        /**
+         * Set the car lights.
+         *
+         * @param mask Lights mask bits: headlights, brakelights, frontlights, engine.
+         * @param on The light state.
+         */
+        function setLights(mask, on) {
+          console.log('Set lights: mask=' + mask + ', on=' + on);
+          let cmd = new Uint8Array([0x2, 0x1d, (on ? 0xf0 : 0) | mask]);
+
+          sendCommand(cmd).then(() => {
+            console.log('Lights set.');
+          })
+          .catch(handleError);
+        }
+
+        /**
+         * Set the lights pattern.
+         *
+         * @param channel The target lights (RED, TAIL, BLUE, GREEN, FRONTL, FRONTR).
+         * @param effect The type of desired effect (STEADY, FADE, THROB, FLASH, RANDOM).
+         * @param start The starting intensity of the LED.
+         * @param end The end intensity of the LED.
+         * @param cycles The frequency repeated start->end transition phases (according to effect) per minute.
+         */
+        function setLightsPattern(channel, effect, start, end, cycles) {
+          console.log('Set ligths pattern: channel=' + channel +', effect=' + effect +', start=' + start +', end=' + end +', cycles=' + cycles);
+          let cmd = new Uint8Array([0x6, 0x33, channel, effect, start, end, cycles & 0xff, (cycles >> 8) & 0xff]);
+
+          sendCommand(cmd).then(() => {
+            console.log('Lights pattern set.');
+          })
+          .catch(handleError);
+        }
+
+        /**
+         * Set the car speed.
+         *
+         * @param speed The requested vehicle speed in mm/sec.
+         * @param accel The acceleration in mm/sec^2.
+         */
+        function setSpeed(speed, accel) {
+          console.log('Set speed: speed=' + speed +', accel=' + accel);
+          let cmd = new Uint8Array([0x6, 0x24, speed & 0xff, (speed >> 8) & 0xff, (accel >> 8) & 0xff, accel & 0xff, 0]);
+
+          sendCommand(cmd).then(() => {
+            console.log('Speed set.');
+          })
+          .catch(handleError);
+        }
+
+        /**
+         * Set the car offset from the road center. This message is always sent to set the current offset
+         * to zero before a lane change message.
+         *
+         * @param offset The offset from the road center in mm.
+         */
+        function setOffset(offset) {
+          console.log('Set offset: offset=' + offset);
+          let floatInt = floatToIntBits(offset);
+          let cmd = new Uint8Array([0x5, 0x2c, floatInt & 0xff, (floatInt >> 8) & 0xff, (floatInt >> 16) & 0xff, (floatInt >> 24) & 0xff]);
+
+          return sendCommand(cmd).then(() => {
+            console.log('Offset set.');
+          })
+          .catch(handleError);
+        }
+
+        /**
+         * Set the lane of the car.
+         *
+         * @param speed The horizontal speed at for the lane change in mm/sec.
+         * @param accel The horizontal acceleration for the lane change in mm/sec.
+         * @param offset The target offset from the road center in mm.
+         */
+        function setLane(speed, accel, offset) {
+          console.log('Set lane: speed=' + speed +', accel=' + accel +', offset=' + offset);
+          let floatInt = floatToIntBits(offset);
+          let cmd = new Uint8Array([0x9, 0x25, speed & 0xff, (speed >> 8) & 0xff, accel & 0xff, (accel >> 8) & 0xff, floatInt & 0xff, (floatInt >> 8) & 0xff, (floatInt >> 16) & 0xff, (floatInt >> 24) & 0xff, 0, 0]);
+
+          sendCommand(cmd).then(() => {
+            console.log('Lane set.');
+          })
+          .catch(handleError);
+        }
+
+        /**
+         * Change the lane of the car.
+         *
+         * @param speed The horizontal speed at for the lane change in mm/sec.
+         * @param accel The horizontal acceleration for the lane change in mm/sec.
+         * @param offset The target offset from the road center in mm.
+         */
+        function changeLange(speed, accel, offset) {
+          // Zero the current offset first to allow the lane change to control the relative horizontal movement of the car.
+          setOffset(0).then(() => {
+            setLane(speed, accel, offset);
+          });
+        }
+
+        /**
+         * Disconnect the device.
+         */
+        function disconnect() {
+          console.log('Disconnect');
+          let cmd = new Uint8Array([0x1, 0xd]);
+
+          sendCommand(cmd).then(() => {
+            resetVariables();
+            console.log('Disconnected.');
+          })
+          .catch(handleError);
+        }
+
+        /**
+         * Get the device firmware version.
+         */
+        function getVersion() {
+          console.log('Get version');
+          let cmd = new Uint8Array([0x1, 0x18]);
+
+          sendCommand(cmd).then(() => {
+            console.log('Got version.');
+          })
+          .catch(handleError);
+        }
+
+        connectToggle.addEventListener('click', () => {
+          if (gattServer != null && gattServer.connected) {
+            disconnect();
+          } else {
+            console.log('Connecting...');
+            progress.hidden = false;
+            if (readCharacteristic == null) {
+              navigator.bluetooth.requestDevice({
+                filters: [{
+                  services: ['be15beef-6186-407e-8381-0bd89c4d8df4']
+                }]
+              })
+              .then(device => {
+                // LOCAL_NAME consists of the vehicle state, firmware version and a user-defined vehicle name.
+                let state = device.name.charCodeAt(0);
+                let fullBattery = (state & (1 << 4)) == (1 << 4);
+                console.log('> fullBattery=' + fullBattery);
+                let lowBattery = (state & (1 << 5)) == (1 << 5);
+                console.log('> lowBattery=' + lowBattery);
+                let charging = (state & (1 << 6)) == (1 << 6);
+                console.log('> charging=' + charging);
+                let version = ((device.name.charCodeAt(2) & 0xff) << 8) | (device.name.charCodeAt(1) & 0xff);
+                console.log('> version=' + version);
+                let carName = device.name.substring(8, device.name.length);
+                console.log('> carName=' + carName);
+
+                console.log('Connecting to GATT Server...');
+                return device.connectGATT();
+              })
+              .then(server => {
+                console.log('> Found GATT server');
+                gattServer = server;
+                // Get car service
+                return gattServer.getPrimaryService('be15beef-6186-407e-8381-0bd89c4d8df4');
+              })
+              .then(service => {
+                console.log('> Found car service');
+                driveService = service;
+                // Get write characteristic
+                return driveService.getCharacteristic('be15bee1-6186-407e-8381-0bd89c4d8df4');
+              })
+              .then(characteristic => {
+                console.log('> Found write characteristic');
+                writeCharacteristic = characteristic;
+                // Get read characteristic
+                return driveService.getCharacteristic('be15bee0-6186-407e-8381-0bd89c4d8df4');
+              })
+              .then(characteristic => {
+                console.log('> Found read characteristic');
+                readCharacteristic = characteristic;
+                progress.hidden = true;
+                // Listen to device notifications
+                return readCharacteristic.startNotifications().then(() => {
+                  readCharacteristic.addEventListener('characteristicvaluechanged', event => {
+                    console.log('> characteristicvaluechanged = ' + event.target.value + ' [' + event.target.value.byteLength +']');
+                    if (event.target.value.byteLength >= 2) {
+                      let value = new Uint8Array(event.target.value);
+                      switch(value[1]) {
+                        case 0x17:
+                            console.log('pong');
+                            break;
+                        case 0x19:
+                            console.log('version = ' + readShort(value, 2));
+                            break;
+                        case 0x36:
+                            console.log('speed = ' + readShort(value, 2));
+                            break;
+                        case 0x27:
+                            console.log('position');
+                            break;
+                        case 0x29:
+                            console.log('transition');
+                            break;
+                        case 0x2d:
+                            console.log('offset');
+                            break;
+                        case 0x2b:
+                            console.log('delocalized');
+                            break;
+                        case 0x3f:
+                            console.log('status update: charging=' + value[3] + ', lowBattery=' + value[4] + ', fullBattery=' + value[5]);
+                            break;
+                        default:
+                            console.log('unknown change: ' + value[1].toString(16));
+                      }
+                    }
+                  });
+                  setSdkMode();
+                });
+              })
+              .catch(handleError);
+            } else {
+              progress.hidden = true;
+              setSdkMode();
+            }
+          }
+        });
+
+        lightsButton.addEventListener('click', function () {
+          // Toggle lights.
+          lightsOn = !lightsOn;
+          setLights(1 | 2 | 4 | 8, lightsOn);
+        });
+
+        lightsPatternButton.addEventListener('click', function () {
+          setLightsPattern(0, 2, 1, 14, 120);
+        });
+
+        startButton.addEventListener('click', function () {
+          setSpeed(1000, 25000);
+        });
+
+        stopButton.addEventListener('click', function () {
+          setSpeed(0, 25000);
+        });
+
+        changeLaneLeftButton.addEventListener('click', function () {
+          changeLange(1000, 2500, -50.0);
+        });
+
+        changeLaneRightButton.addEventListener('click', function () {
+          changeLange(1000, 2500, 50.0);
+        });
+      });
+    </script>
+  </body>
+</html>
