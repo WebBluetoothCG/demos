@@ -146,13 +146,14 @@
     _readCharacteristicValue(characteristicUuid) {
       let characteristic = this._characteristics.get(characteristicUuid);
       return characteristic.readValue()
-      .then(buffer => {
-        let data = new DataView(buffer);
+      .then(value => {
+        // In Chrome 50+, a DataView is returned instead of an ArrayBuffer.
+        value = value.buffer ? value : new DataView(value);
         if (this._debug) {
-          for (var i = 0, a = []; i < data.byteLength; i++) { a.push(data.getUint8(i)); }
+          for (var i = 0, a = []; i < value.byteLength; i++) { a.push(value.getUint8(i)); }
           console.debug('READ', characteristic.uuid, a);
         }
-        return data;
+        return value;
       });
     }
     _writeCharacteristicValue(characteristicUuid, value) {
