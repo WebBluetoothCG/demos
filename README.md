@@ -10,3 +10,4 @@
 ### Hosted Elsewhere
 
 - [CoolBeans for Node.js](https://github.com/monteslu/coolbeans) created by [@monteslu](https://github.com/monteslu)
+- [Parrot Mini Drone Controller](https://github.com/poshaughnessy/web-bluetooth-parrot-drone) created by [@poshaughnessy](https://github.com/poshaughnessy)
