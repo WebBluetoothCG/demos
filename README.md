@@ -9,5 +9,6 @@
 
 ### Hosted Elsewhere
 
-- [CoolBeans for Node.js](https://github.com/monteslu/coolbeans) created by [@monteslu](https://github.com/monteslu)
-- [Parrot Mini Drone Controller](https://github.com/poshaughnessy/web-bluetooth-parrot-drone) created by [@poshaughnessy](https://github.com/poshaughnessy)
+- [CoolBeans for Node.js](https://github.com/monteslu/coolbeans) by [@monteslu](https://github.com/monteslu)
+- [BB-8 Controlled via Web Bluetooth and Web Audio](https://nimbleape.github.io/demos/bluetooth-toy-bb8/) by [@nimbleape](https://github.com/nimbleape)
+- [Parrot Mini Drone Controller](https://github.com/poshaughnessy/web-bluetooth-parrot-drone) by [@poshaughnessy](https://github.com/poshaughnessy)
