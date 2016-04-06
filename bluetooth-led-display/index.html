@@ -1,0 +1,518 @@
+<!doctype html>
+<!--
+Copyright 2016 Google Inc. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<html>
+  <head>
+    <title>LED Display</title>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <meta name="origin-trials" content="1|g0kT35bpMj64sJz+VNzYNHCQQyg74t0CORWooeCKrqhDtg6xA1/hJIOnMlOROZ5zMVQJ8WYH+zTMO14S6sNcAg==|https://webbluetoothcg.github.io:443|WebBluetooth|1460390521">
+
+    <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+
+    <!-- Polymer components -->
+    <link rel="import" href="bower_components/paper-progress/paper-progress.html">
+    <link rel="import" href="bower_components/paper-button/paper-button.html">
+    <link rel="import" href="bower_components/iron-icons/iron-icons.html">
+    <link rel="import" href="bower_components/iron-icons/image-icons.html">
+    <link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
+    <link rel="import" href="bower_components/paper-card/paper-card.html">
+    <link rel="import" href="bower_components/paper-dialog/paper-dialog.html">
+    <link rel="import" href="bower_components/paper-toggle-button/paper-toggle-button.html">
+    <link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout.html">
+
+    <link rel="import" href="bower_components/paper-dialog/paper-dialog.html">
+    <link rel="import" href="bower_components/paper-button/paper-button.html">
+    <link rel="import" href="bower_components/paper-input/paper-input.html">
+
+    <!-- https://github.com/David-Mulder/paper-color-picker -->
+    <link rel="import" href="bower_components/paper-color-picker/paper-color-picker.html">
+
+    <link rel="import" href="bower_components/paper-styles/color.html">
+    <link rel="stylesheet" href="bower_components/paper-styles/demo.css">
+
+    <style is="custom-style">
+      body {
+        background-color: var(--paper-grey-50);
+      }
+      paper-progress {
+        width: 100%;
+      }
+      paper-progress.blue {
+        paper-progress-active-color: var(--paper-light-blue-500);
+        paper-progress-secondary-color: var(--paper-light-blue-100);
+      }
+      paper-toggle-button.blue {
+        --paper-toggle-button-checked-bar-color:  var(--paper-light-blue-500);
+        --paper-toggle-button-checked-button-color:  var(--paper-light-blue-500);
+        --paper-toggle-button-checked-ink-color: var(--paper-light-blue-500);
+        --paper-toggle-button-unchecked-bar-color:  var(--paper-light-blue-900);
+        --paper-toggle-button-unchecked-button-color:  var(--paper-light-blue-900);
+        --paper-toggle-button-unchecked-ink-color: var(--paper-light-blue-900);
+      }
+      paper-button {
+        display: block;
+        width: 40px;
+        height: 40px;
+        min-width: 0em;
+        margin: 0.2em 0.2em;
+      }
+      paper-button.blue {
+        color: var(--paper-light-blue-500);
+        paper-button-flat-focus-color: var(--paper-light-blue-50);
+      }
+      #cards {
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 400px;
+      }
+      paper-card {
+        margin-bottom: 5px;
+        margin-top: 5px;
+        width: 100%;
+      }
+      .flex {
+        @apply(--layout-horizontal);
+      }
+    </style>
+  </head>
+  <body unresolved>
+    <template id="template" is="dom-bind">
+      <div id="cards">
+        <paper-card heading="LED Display">
+          <div class="card-content">
+            <paper-toggle-button class="blue" id="connect">Connect</paper-toggle-button>
+            <paper-progress id="progress" indeterminate></paper-progress>
+          </div>
+        </paper-card>
+
+        <paper-card id="panel">
+          <div class="card-content">
+            <div class="container flex">
+              <paper-button id="button11" raised noink></paper-button>
+              <paper-button id="button12" raised noink></paper-button>
+              <paper-button id="button13" raised noink></paper-button>
+              <paper-button id="button14" raised noink></paper-button>
+              <paper-button id="button15" raised noink></paper-button>
+              <paper-button id="button16" raised noink></paper-button>
+              <paper-button id="button17" raised noink></paper-button>
+              <paper-button id="button18" raised noink></paper-button>
+            </div>
+            <div class="container flex">
+              <paper-button id="button21" raised noink></paper-button>
+              <paper-button id="button22" raised noink></paper-button>
+              <paper-button id="button23" raised noink></paper-button>
+              <paper-button id="button24" raised noink></paper-button>
+              <paper-button id="button25" raised noink></paper-button>
+              <paper-button id="button26" raised noink></paper-button>
+              <paper-button id="button27" raised noink></paper-button>
+              <paper-button id="button28" raised noink></paper-button>
+            </div>
+            <div class="container flex">
+              <paper-button id="button31" raised noink></paper-button>
+              <paper-button id="button32" raised noink></paper-button>
+              <paper-button id="button33" raised noink></paper-button>
+              <paper-button id="button34" raised noink></paper-button>
+              <paper-button id="button35" raised noink></paper-button>
+              <paper-button id="button36" raised noink></paper-button>
+              <paper-button id="button37" raised noink></paper-button>
+              <paper-button id="button38" raised noink></paper-button>
+            </div>
+            <div class="container flex">
+              <paper-button id="button41" raised noink></paper-button>
+              <paper-button id="button42" raised noink></paper-button>
+              <paper-button id="button43" raised noink></paper-button>
+              <paper-button id="button44" raised noink></paper-button>
+              <paper-button id="button45" raised noink></paper-button>
+              <paper-button id="button46" raised noink></paper-button>
+              <paper-button id="button47" raised noink></paper-button>
+              <paper-button id="button48" raised noink></paper-button>
+            </div>
+            <div class="container flex">
+              <paper-button id="button51" raised noink></paper-button>
+              <paper-button id="button52" raised noink></paper-button>
+              <paper-button id="button53" raised noink></paper-button>
+              <paper-button id="button54" raised noink></paper-button>
+              <paper-button id="button55" raised noink></paper-button>
+              <paper-button id="button56" raised noink></paper-button>
+              <paper-button id="button57" raised noink></paper-button>
+              <paper-button id="button58" raised noink></paper-button>
+            </div>
+            <div class="container flex">
+              <paper-button id="button61" raised noink></paper-button>
+              <paper-button id="button62" raised noink></paper-button>
+              <paper-button id="button63" raised noink></paper-button>
+              <paper-button id="button64" raised noink></paper-button>
+              <paper-button id="button65" raised noink></paper-button>
+              <paper-button id="button66" raised noink></paper-button>
+              <paper-button id="button67" raised noink></paper-button>
+              <paper-button id="button68" raised noink></paper-button>
+            </div>
+            <div class="container flex">
+              <paper-button id="button71" raised noink></paper-button>
+              <paper-button id="button72" raised noink></paper-button>
+              <paper-button id="button73" raised noink></paper-button>
+              <paper-button id="button74" raised noink></paper-button>
+              <paper-button id="button75" raised noink></paper-button>
+              <paper-button id="button76" raised noink></paper-button>
+              <paper-button id="button77" raised noink></paper-button>
+              <paper-button id="button78" raised noink></paper-button>
+            </div>
+            <div class="container flex">
+              <paper-button id="button81" raised noink></paper-button>
+              <paper-button id="button82" raised noink></paper-button>
+              <paper-button id="button83" raised noink></paper-button>
+              <paper-button id="button84" raised noink></paper-button>
+              <paper-button id="button85" raised noink></paper-button>
+              <paper-button id="button86" raised noink></paper-button>
+              <paper-button id="button87" raised noink></paper-button>
+              <paper-button id="button88" raised noink></paper-button>
+            </div>
+          </div>
+        </paper-card>
+
+        <paper-card id="colors">
+          <div class="card-content">
+            <div class="container flex">
+              <paper-button id="color1" toggles raised noink active></paper-button>
+              <paper-button id="color2" toggles raised noink></paper-button>
+              <paper-button id="color3" toggles raised noink></paper-button>
+              <paper-button id="color4" toggles raised noink></paper-button>
+              <paper-button id="color5" toggles raised noink></paper-button>
+              <paper-button id="color6" toggles raised noink></paper-button>
+              <paper-icon-button id="colorPicker" toggles raised noink icon="image:colorize"></paper-icon-button>
+              <paper-icon-button id="colorClear" toggles raised noink icon="icons:clear"></paper-icon-button>
+            </div>
+          </div>
+        </paper-card>
+
+        <paper-color-picker id="picker"></paper-color-picker>
+
+        <paper-dialog id="no-bluetooth">
+          <h2>No Web Bluetooth</h2>
+          <p>The Web Bluetooth API is missing. Please enable it at
+          chrome://flags/#enable-web-bluetooth and try again.</p>
+        </paper-dialog>
+
+        <paper-dialog id="errorDialog">
+          <h2>Error</h2>
+          <p>Could not connect to bluetooth device!</p>
+        </paper-dialog>
+      </div>
+    </template>
+
+    <script>
+      'use strict';
+      document.addEventListener('WebComponentsReady', () => {
+        let connectToggle = document.querySelector('#connect');
+        let progress = document.querySelector('#progress');
+        let dialog = document.querySelector('#errorDialog');
+        let picker = document.querySelector('#picker');
+        let pickerButton = document.querySelector('#colorPicker');
+        let clearButton = document.querySelector('#colorClear');
+        let activeColorButton = document.querySelector('#color1');
+        let gattServer;
+        let commandService;
+        let writeCharacteristic;
+        let busy = false;
+        let colorChangeListener = null;
+        let currentColor;
+        let commandQueue = [];
+
+        picker.alwaysShowAlpha = false;
+        picker.colorValue = 1;
+        picker.shape = 'huebox';
+        progress.hidden = true;
+
+        /**
+         * Check if browser supports Web Bluetooth API.
+         */
+        if (navigator.bluetooth == undefined) {
+          document.getElementById("no-bluetooth").style.display = "block";
+          document.getElementById("no-bluetooth").open();
+        }
+
+        /**
+         * Set the default display buttons color and hook up click listener.
+         */
+        for (let i=1; i<=8; i++) {
+          for(let j=1; j<=8; j++) {
+            let button = document.querySelector('#button'+i+''+j);
+            button.style.backgroundColor = "#000000";
+            button.addEventListener('click', buttonClicked);
+          }
+        }
+
+        /**
+         * Fill color palette with some default colors.
+         */
+        for(let i=1; i<=6; i++) {
+          let button = document.querySelector('#color'+i);
+          switch (i) {
+            case 1:
+              button.style.backgroundColor = "#f00";
+              break;
+            case 2:
+              button.style.backgroundColor = "#0f0";
+              break;
+            case 3:
+              button.style.backgroundColor = "#00f";
+              break;
+            case 4:
+              button.style.backgroundColor = "#ffbe00";
+              break;
+            case 5:
+              button.style.backgroundColor = "#000";
+              break;
+            default:
+              button.style.backgroundColor = "#fff";
+          }
+          button.addEventListener('click', colorClicked);
+        }
+        currentColor = colorFromRgb(activeColorButton.style.backgroundColor);
+
+        /**
+         * Display the color picker when the user clicks the picker icon button.
+         */
+        pickerButton.addEventListener('click', function(event) {
+          if (colorChangeListener) {
+            picker.removeEventListener('color-as-string-changed', colorChangeListener);
+          }
+          picker.set('immediateColor', colorFromRgb(activeColorButton.style.backgroundColor));
+          picker.addEventListener('color-as-string-changed', colorChangeListener = function() {
+            activeColorButton.style.backgroundColor = colorToHex(picker.color);
+            currentColor.red = picker.color.red;
+            currentColor.green = picker.color.green;
+            currentColor.blue = picker.color.blue;
+            currentColor.alpha = picker.color.alpha;
+          });
+          picker.open();
+        });
+
+        function clearPanel() {
+          for (let i=1; i<=8; i++) {
+            for(let j=1; j<=8; j++) {
+              let button = document.querySelector('#button'+i+''+j);
+              button.style.backgroundColor = "#000000";
+            }
+          }
+          setPanelColor(0, 0, 0);
+        }
+
+        /**
+         * Clear the display when the user clicks the clear icon button.
+         */
+        clearButton.addEventListener('click', function(event) {
+          clearPanel();
+        });
+
+        /**
+         * Reset the app variable states.
+         */
+        function resetVariables() {
+          busy = false;
+          progress.hidden = true;
+          gattServer = null;
+          commandService = null;
+          writeCharacteristic = null;
+        }
+
+        /**
+         * API error handler.
+         */
+        function handleError(error) {
+          console.log(error);
+          resetVariables();
+          dialog.open();
+        }
+
+        /**
+         * Toggle the active status of the selected color palette button.
+         */
+        function resetOtherPaletteButtons(currentButton) {
+          for(let i=1; i<=6; i++) {
+            let button = document.querySelector('#color'+i);
+            if (button.id != currentButton.id) {
+              button.active = false;
+            }
+          }
+        }
+
+        /**
+         * Set the color of the display button to the currently selected palette color.
+         */
+        function buttonClicked(event) {
+          let id = event.target.id;
+          setLedColor(Number(id.substring(6,7)), Number(id.substring(7,8)), currentColor.red, currentColor.green, currentColor.blue);
+          event.target.style.backgroundColor = colorToHex(currentColor);
+        }
+
+        /**
+         * Set the current to the selected color palette button color.
+         */
+        function colorClicked(event) {
+          activeColorButton = event.target;
+          resetOtherPaletteButtons(activeColorButton);
+          currentColor = colorFromRgb(activeColorButton.style.backgroundColor);
+        }
+
+        /**
+         * Utility function to convert RGB color to HTML Hex format.
+         *
+         * @param value The JSON rgb color value: {"red": 0, "green": 0, "blue": 0}
+         */
+        function colorToHex(value) {
+          let hex = '#';
+          ['red', 'green', 'blue'].forEach(function(color) {
+              let hexComponent = value[color].toString(16);
+              let length = hexComponent.length;
+              hex += length < 2 ? '0' : '';
+              hex += length < 1 ? '0' : '';
+              hex += hexComponent;
+            });
+          return hex;
+        }
+
+        /**
+         * Parse HTML RGB color format into JSON component values.
+         *
+         * @param value The rgb color value: rgb(0, 0, 0)
+         */
+        function colorFromRgb(value) {
+          let result = /^rgb\(([\d]{1,3}),\s([\d]{1,3}),\s([\d]{1,3})\)$/i.exec(value);
+          if (result) {
+            return {"red": parseInt(result[1]), "green": parseInt(result[2]), "blue": parseInt(result[3]), "alpha": 1};
+          } else {
+            return currentColor;
+          }
+        }
+
+        /**
+         * Send a command to the device.
+         * See http://wittidesign.com/en/developer/ for API.
+         *
+         * @param cmd The command bytes and associated data.
+         */
+        function sendCommand(cmd) {
+          if (writeCharacteristic) {
+            // Handle one command at a time
+            if (busy) {
+              // Queue commands
+              commandQueue.push(cmd);
+              return Promise.resolve();
+            }
+            busy = true;
+
+            return writeCharacteristic.writeValue(cmd).then(() => {
+              busy = false;
+              // Get next command from queue
+              let nextCommand = commandQueue.shift();
+              if (nextCommand) {
+                sendCommand(nextCommand);
+              }
+            });
+          } else {
+            return Promise.resolve();
+          }
+        }
+
+        /**
+         * Set color of the panel.
+         */
+        function setPanelColor(red, green, blue) {
+          console.log('Set panel color');
+          let command = 0x0601;
+          let cmd = new Uint8Array([(command >> 8) & 0xff, command & 0xff, red, green, blue]);
+
+          sendCommand(cmd).then(() => {
+            console.log('panel color set.');
+          })
+          .catch(handleError);
+        }
+
+        /**
+         * Set color of an LED.
+         */
+        function setLedColor(row, column, red, green, blue) {
+          console.log('Set LED color: ' + red + ', ' + green + ', ' + blue);
+          let position = (row-1)*8 + column;
+          let command = 0x0702;
+          let cmd = new Uint8Array([(command >> 8) & 0xff, command & 0xff, position, red, green, blue]);
+
+          sendCommand(cmd).then(() => {
+            console.log('LED color set.');
+          })
+          .catch(handleError);
+        }
+
+        /**
+         * Connect to command characteristic.
+         */
+        connectToggle.addEventListener('click', () => {
+          if (gattServer != null && gattServer.connected) {
+            if (gattServer.disconnect) {
+              console.log('Disconnecting...');
+              gattServer.disconnect();
+            }
+            resetVariables();
+          } else {
+            console.log('Connecting...');
+            progress.hidden = false;
+            if (writeCharacteristic == null) {
+              navigator.bluetooth.requestDevice({
+                filters: [{
+                  namePrefix: 'Dotti',
+                }],
+                optionalServices: ['0000fff0-0000-1000-8000-00805f9b34fb']
+              })
+              .then(device => {
+                console.log('Connecting to GATT Server...');
+                return device.connectGATT();
+              })
+              .then(server => {
+                console.log('> Found GATT server');
+                gattServer = server;
+                // Get command service
+                return gattServer.getPrimaryService('0000fff0-0000-1000-8000-00805f9b34fb');
+              })
+              .then(service => {
+                console.log('> Found command service');
+                commandService = service;
+                // Get write characteristic
+                return commandService.getCharacteristic('0000fff3-0000-1000-8000-00805f9b34fb');
+              })
+              .then(characteristic => {
+                console.log('> Found write characteristic');
+                writeCharacteristic = characteristic;
+                progress.hidden = true;
+                clearPanel();
+              })
+              .catch(handleError);
+            } else {
+              progress.hidden = true;
+              clearPanel();
+            }
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

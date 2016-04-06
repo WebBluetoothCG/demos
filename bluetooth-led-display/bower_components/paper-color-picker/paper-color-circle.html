@@ -1,0 +1,463 @@
+<link href="../polymer/polymer.html" rel="import">
+<link href="../paper-ripple/paper-ripple.html" rel="import">
+<link href="../iron-resizable-behavior/iron-resizable-behavior.html" rel="import">
+
+<dom-module id="paper-color-circle">
+  <template>
+    <style>
+      :host {
+        display: inline-block;
+        position: relative;
+      }
+      canvas{
+        min-width: 100px;
+        min-height: 100px;
+        cursor: crosshair;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+      #rippleContainer{
+        position: relative;
+        margin: auto;
+      }
+    </style>
+
+    <div id="rippleContainer">
+      <canvas id="canvas" on-down="onDown" on-up="onUp" on-track="onMove"></canvas>
+      <paper-ripple id="ripple" class$="{{shape}}" recenters noink></paper-ripple>
+    </div>
+  </template>
+  <script>
+    (function(){
+      function hsv2rgb(h, s, v){
+        var c = v * s;
+        var h1 = h / 60;
+        var x = c * (1 - Math.abs((h1 % 2) - 1));
+        var m = v - c;
+        var rgb;
+        if(typeof h == 'undefined') rgb = [0, 0, 0];
+        else if(h1 < 1) rgb = [c, x, 0];
+        else if(h1 < 2) rgb = [x, c, 0];
+        else if(h1 < 3) rgb = [0, c, x];
+        else if(h1 < 4) rgb = [0, x, c];
+        else if(h1 < 5) rgb = [x, 0, c];
+        else if(h1 <= 6) rgb = [c, 0, x];
+        return [255 * (rgb[0] + m), 255 * (rgb[1] + m), 255 * (rgb[2] + m)];
+      }
+
+      function hsl2rgb(h, s, l){
+        var r, g, b;
+        h /= 360;
+        if(s == 0){
+          r = g = b = l; // achromatic
+        }else{
+          function hue2rgb(p, q, t){
+            if(t < 0) t += 1;
+            if(t > 1) t -= 1;
+            if(t < 1/6) return p + (q - p) * 6 * t;
+            if(t < 1/2) return q;
+            if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+            return p;
+          }
+
+          var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+          var p = 2 * l - q;
+          r = hue2rgb(p, q, h + 1/3);
+          g = hue2rgb(p, q, h);
+          b = hue2rgb(p, q, h - 1/3);
+        }
+
+        return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+      }
+      function rgb2hsl(r, g, b){
+        r /= 255, g /= 255, b /= 255;
+        var max = Math.max(r, g, b), min = Math.min(r, g, b);
+        var h, s, l = (max + min) / 2;
+
+        if(max == min){
+          h = s = 0;
+        }else{
+          var d = max - min;
+          s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+          switch(max){
+            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+            case g: h = (b - r) / d + 2; break;
+            case b: h = (r - g) / d + 4; break;
+          }
+          h /= 6;
+        }
+
+        return [h, s, l];
+      }
+      var rgb2hsv = function(r,g,b) {
+        var b, delta, g, h, max, min, r, s, v;
+        min = Math.min(r, g, b);
+        max = Math.max(r, g, b);
+        delta = max - min;
+        v = max / 255.0;
+        if (max === 0) {
+          h = Number.NaN;
+          s = 0;
+        } else {
+          s = delta / max;
+          if (r === max) {
+            h = (g - b) / delta;
+          }
+          if (g === max) {
+            h = 2 + (b - r) / delta;
+          }
+          if (b === max) {
+            h = 4 + (r - g) / delta;
+          }
+          h *= 60;
+          if (h < 0) {
+            h += 360;
+          }
+        }
+        return [h/360, s, v];
+      };
+
+      Polymer({
+        is: 'paper-color-circle',
+        properties: {
+          /**
+           * A AA border can be drawn to prevent jagged edges on circles
+           *
+           * @attribute colouredAaBorder
+           * @type boolean
+           * @default false
+           */
+          noAaBorder: {
+            type: Boolean,
+            value: false
+          },
+          _ctx: {
+            type: Object,
+            value: function(){
+              return {};
+            }
+          },
+          _domReady: {
+            type: Boolean,
+            value: false
+          },
+          _down: {
+            type: Boolean,
+            value: false
+          },
+          _moveStart: {
+            type: Boolean,
+            value: false
+          },
+          _redrawTimer: {
+            type: Number,
+            value: 0
+          },
+          _setAaBorder: {
+            value: function(){
+              return undefined;
+            }
+          },
+          /**
+           * Picked color
+           *
+           * @attribute color
+           * @type Array
+           * @default new Array(2)
+           */
+          color: {
+            type: Object,
+            notify: true,
+            value: {
+              red: undefined,
+              green: undefined,
+              blue: undefined
+            }
+          },
+          /**
+           * A coloured AA border can be drawn to prevent jagged edges on circles
+           *
+           * @attribute colouredAaBorder
+           * @type Array
+           * @default false
+           */
+          colouredAaBorder: {
+            type: Boolean,
+            value: false,
+            notify: true
+          },
+          hsl2rgb: {
+            value: function(){
+              return hsl2rgb;
+            }
+          },
+          rgb2hsl: {
+            value: function(){
+              return rgb2hsl;
+            }
+          },
+          hsv2rgb: {
+            value: function(){
+              return hsv2rgb;
+            }
+          },
+          rgb2hsv: {
+            value: function(){
+              return rgb2hsv;
+            }
+          },
+          /**
+           * In case of a huebox, the hue from 0 to 1
+           *
+           * @attribute value
+           * @type number
+           * @default 1
+           */
+          hue: {
+            type: Number,
+            value: 0,
+            notify: true,
+            observer: 'hueChanged'
+          },
+          /**
+           * In case of hsl, the lightness
+           *
+           * @attribute lightness
+           * @type number
+           * @default .5
+           */
+          lightness: {
+            type: Number,
+            value: 0.5,
+            notify: true,
+            observer: 'lightnessChanged'
+          },
+          /**
+           * square, circle or huebox
+           *
+           * @attribute shape
+           * @type string
+           * @default 'circle'
+           */
+          shape: {
+            type: String,
+            value: 'circle',
+            notify: true
+          },
+          /**
+           * hsv OR hsl
+           *
+           * @attribute type
+           * @type string
+           * @default 'hsv'
+           */
+          type: {
+            type: String,
+            value: 'hsv',
+            notify: true
+          },
+          /**
+           * In case of hsv, the value
+           *
+           * @attribute value
+           * @type number
+           * @default 1
+           */
+          value: {
+            type: Number,
+            value: 1,
+            notify: true,
+            observer: 'valueChanged'
+          }
+        },
+        observers: [
+          'colorChanged(color.*)'
+        ],
+        behaviors: [
+          Polymer.IronResizableBehavior
+        ],
+        listeners: {
+          'iron-resize': 'redraw'
+        },
+        pickColor: function(e){
+          var rect = this.getBoundingClientRect();
+          var touchX = e.detail.x - rect.left;
+          var touchY = e.detail.y - rect.top;
+          var color = this._ctx.getImageData(touchX, touchY, 1, 1).data;
+          if(this.shape === 'circle'){
+            var distance = Math.abs(Math.sqrt(Math.pow(touchX-this.size/2, 2) + Math.pow(touchY-this.size/2, 2))-this.size/2);
+            if(distance < this.size/100){
+              return;
+            }
+          }
+          if(color[3] > 0 && color[3] == 255){
+            this.set('color.red', color[0]);
+            this.set('color.green', color[1]);
+            this.set('color.blue', color[2]);
+            if(!this.noAaBorder && this.colouredAaBorder)
+              this.redraw();
+          }
+        },
+        onDown: function(e){
+          this.pickColor(e, true);
+          this._trackingColorChanges = true;
+        },
+        onMove: function(e){
+          this.pickColor(e);
+        },
+        onUp: function(e){
+          this._trackingColorChanges = false;
+          this.$.ripple.style.color = 'rgb(' + this.color['red'] + ',' + this.color['green'] + ',' + this.color['blue'] + ')';
+
+          this.$.ripple.downAction(e);
+          this.async(function(){
+            this.$.ripple.upAction();
+          })
+        },
+        redraw: function(){
+          this.debounce('redraw', function(){
+            var size = this.getBoundingClientRect();
+            var width = size.width;
+            var height = size.height;
+            if(width == 0 || height == 0){
+              var computedStyle = window.getComputedStyle(this);
+              width = parseInt(computedStyle.width);
+              height = parseInt(computedStyle.height);
+            }
+            this.size = Math.min(width, height);
+            this.$.canvas.width = this.size;
+            this.$.canvas.height = this.size;
+            this.$.rippleContainer.style.width = this.size + 'px';
+            this.$.rippleContainer.style.height = this.size + 'px';
+
+            var halfsize = this.size/2;
+            var bitmap = this._ctx.getImageData(0, 0, this.size, this.size);
+            var smoothBorder = 0;
+            for (var y = 0; y < this.size; y++){
+              for (var x = 0; x < this.size; x++){
+
+                // offset for the 4 RGBA values in the data array
+                var offset = 4 * ((y * this.size) + x);
+
+                if(this.shape === 'circle'){
+                  var distanceFromCenter = Math.sqrt(Math.pow(y - halfsize, 2) + Math.pow(x - halfsize, 2)) / halfsize;
+                  if(distanceFromCenter < (halfsize+smoothBorder)/halfsize - 0.01){
+                    var hue = Math.atan2(y - halfsize, x - halfsize) * (180 / Math.PI);
+                    if(hue < 0) hue+=360;
+                    var saturation = Math.round(distanceFromCenter*1000)/1000;
+                    saturation = Math.min(1, saturation);
+                    if(this.type === 'hsv'){
+                      var value = Math.round(this.value*1000)/1000;
+                      var color = hsv2rgb(hue, saturation, value);
+                    }else if(this.type === 'hsl'){
+                      var lightness = Math.round(this.lightness*1000)/1000;
+                      var color = hsl2rgb(hue, saturation, lightness);
+                    }
+
+                    // fill RGBA values
+                    bitmap.data[offset + 0] = color[0];
+                    bitmap.data[offset + 1] = color[1];
+                    bitmap.data[offset + 2] = color[2];
+                    if(distanceFromCenter - 1 >= 0){
+                      var distance = Math.round((distanceFromCenter - 1)*halfsize);
+
+                      bitmap.data[offset + 3] = 255*((smoothBorder-distance)/smoothBorder); // transparency
+                    }else{
+                      bitmap.data[offset + 3] = 255; // no transparency
+                    }
+                  };
+                }else if(this.shape === 'huebox'){
+                  var saturation = x/width;
+                  var hue = Math.round(this.hue*1000)/1000*360;
+                  var third = 1-y/this.size;
+                  if(this.type === 'hsv'){
+                    var color = hsv2rgb(hue, saturation, third);
+                  }else if(this.type === 'hsl'){
+                    var color = hsl2rgb(hue, saturation, third);
+                  }
+                  bitmap.data[offset + 0] = color[0];
+                  bitmap.data[offset + 1] = color[1];
+                  bitmap.data[offset + 2] = color[2];
+                  bitmap.data[offset + 3] = 255; // no transparency
+                }else if(this.shape === 'square'){
+                  var hue = x/width*360;
+                  var saturation = 1-y/this.size;
+                  if(this.type === 'hsv'){
+                    var value = Math.round(this.value*1000)/1000;
+                    var color = hsv2rgb(hue, saturation, value);
+                  }else if(this.type === 'hsl'){
+                    var lightness = Math.round(this.lightness*1000)/1000;
+                    var color = hsl2rgb(hue, saturation, lightness);
+                  }
+                  bitmap.data[offset + 0] = color[0];
+                  bitmap.data[offset + 1] = color[1];
+                  bitmap.data[offset + 2] = color[2];
+                  bitmap.data[offset + 3] = 255; // no transparency
+                }
+
+              };
+            };
+            this._ctx.putImageData(bitmap, 0, 0);
+            if(!this.noAaBorder && this.shape === 'circle'){
+              //Getting a nice anti aliased edge using canvas is hard, so instead a white circle is draw over the border
+              this.drawAACircle();
+            }
+          });
+        },
+        drawAACircle: function(){
+          if(this.colouredAaBorder){
+            if(this.color['green']){
+              this.set('_ctx.strokeStyle', 'rgb(' + this.color['red'] + ',' + this.color['green'] + ',' + this.color['blue'] + ')');
+            } else {
+              this.set('_ctx.strokeStyle', 'rgb(' + this.colouredAaBorder[0] + ',' + this.colouredAaBorder[1] + ',' + this.colouredAaBorder[2] + ')');
+            }
+          } else {
+            this.set('_ctx.strokeStyle', 'rgba(255,255,255,.99)');
+          }
+          this.set('_ctx.lineWidth', this.size/100);
+          this._ctx.beginPath();
+          var borderRadius = this.size / 2;
+          this._ctx.arc(this.size / 2, this.size / 2, borderRadius - 1, 0, 2 * Math.PI, false);
+          this._ctx.closePath();
+          this._ctx.stroke();
+        },
+        valueChanged: function(){
+          if(this._domReady)
+            this.redraw();
+        },
+        lightnessChanged: function(){
+          if(this._domReady)
+            this.redraw();
+        },
+        hueChanged: function(){
+          if(this._domReady)
+            this.redraw();
+        },
+        colorChanged: function(){
+          if(!this._trackingColorChanges){
+            if(this.type == 'hsl'){
+              var hsl = this.rgb2hsl(parseInt(this.color.red), parseInt(this.color.green), parseInt(this.color.blue));
+              this.hue = hsl[0];
+              this.lightness = hsl[2];
+            }else if(this.type == 'hsv'){
+              var hsv = this.rgb2hsv(parseInt(this.color.red), parseInt(this.color.green), parseInt(this.color.blue));
+              if(!isNaN(hsv[0])) this.hue = hsv[0];
+              this.value = hsv[2];
+            }
+          }
+          //if(this._domReady)
+          //  this.redraw();
+        },
+        attached: function(){
+          this._domReady = true;
+          this._ctx = this.$.canvas.getContext('2d');
+          this.redraw();
+        }
+      });
+    }());
+  </script>
+</dom-module>
