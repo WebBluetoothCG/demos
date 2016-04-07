@@ -1,8 +1,10 @@
 # LED Display
 
-This web app demonstrates the use of the Web Bluetooth API for controlling a BLE LED display.
+Available at https://webbluetoothcg.github.io/demos/bluetooth-led-display/
 
 <img src="https://raw.githubusercontent.com/webbluetoothcg/demos/gh-pages/bluetooth-led-display/dotti.jpg">
+
+This web app demonstrates the use of the Web Bluetooth API for controlling a BLE LED display.
 
 ## Dependencies
 * DOTTI LED display: http://wittidesign.com/en/dotti/
