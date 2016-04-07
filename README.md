@@ -1,5 +1,6 @@
 # Web Bluetooth Demos
 
+- [Bluetooth LED Display](/bluetooth-led-display/)
 - [Bluetooth Printer](/bluetooth-printer/)
 - [Bluetooth Racing Cars](/bluetooth-racing-cars/)
 - [Bluetooth Toy BB-8](/bluetooth-toy-bb8/)
