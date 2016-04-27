@@ -1,5 +1,7 @@
 # Web Bluetooth Demos
 
+Hosted here: https://webbluetoothcg.github.io/demos/
+
 - [Bluetooth LED Display](/bluetooth-led-display/)
 - [Bluetooth Printer](/bluetooth-printer/)
 - [Bluetooth Racing Cars](/bluetooth-racing-cars/)
