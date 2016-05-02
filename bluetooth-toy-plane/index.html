@@ -35,8 +35,7 @@ limitations under the License.
     <link rel="import" href="bower_components/paper-button/paper-button.html">
     <link rel="import" href="bower_components/paper-card/paper-card.html">
     <link rel="import" href="bower_components/paper-dialog/paper-dialog.html">
-    <link rel="import" href="bower_components/platinum-bluetooth/platinum-bluetooth-device.html">
-    <link rel="import" href="bower_components/platinum-bluetooth/platinum-bluetooth-characteristic.html">
+    <link rel="import" href="bower_components/platinum-bluetooth/platinum-bluetooth-elements.html">
 
     <link rel="import" href="bower_components/paper-styles/color.html">
     <link rel="stylesheet" href="bower_components/paper-styles/demo.css">
@@ -138,17 +137,19 @@ limitations under the License.
       </paper-dialog>
     </div>
 
-    <platinum-bluetooth-device services-filter='["f000ffc0-0451-4000-b000-000000000000"]' id="plane-device">
-      <platinum-bluetooth-characteristic id="engineCharacteristic"
-        service="75b64e51-f181-4ed1-921a-476090d80ba7"
-        characteristic="75b64e51-f184-4ed1-921a-476090d80ba7"
-        auto-write>
-      </platinum-bluetooth-characteristic>
-      <platinum-bluetooth-characteristic id="rudderCharacteristic"
-        service="75b64e51-f181-4ed1-921a-476090d80ba7"
-        characteristic="75b64e51-f185-4ed1-921a-476090d80ba7"
-        auto-write>
-      </platinum-bluetooth-characteristic>
+    <platinum-bluetooth-device id="plane-device"
+                               name-filter="TailorToys PowerUp"
+                               optional-services-filter='["75b64e51-f181-4ed1-921a-476090d80ba7"]'>
+      <platinum-bluetooth-service service="75b64e51-f181-4ed1-921a-476090d80ba7">
+        <platinum-bluetooth-characteristic id="engineCharacteristic"
+          characteristic="75b64e51-f184-4ed1-921a-476090d80ba7"
+          auto-write>
+        </platinum-bluetooth-characteristic>
+        <platinum-bluetooth-characteristic id="rudderCharacteristic"
+          characteristic="75b64e51-f185-4ed1-921a-476090d80ba7"
+          auto-write>
+        </platinum-bluetooth-characteristic>
+      </platinum-bluetooth-service>
     </platinum-bluetooth-device>
 
     <script>
