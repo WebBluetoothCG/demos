@@ -1,6 +1,5 @@
 {
   "name": "platinum-bluetooth",
-  "version": "1.0.0",
   "private": true,
   "license": "http://polymer.github.io/LICENSE.txt",
   "authors": [
@@ -25,21 +24,21 @@
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.2",
+    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.0.0",
     "marked-element": "PolymerElements/marked-element#^1.0.0",
     "paper-button": "PolymerElements/paper-button#^1.0.0",
     "paper-item": "PolymerElements/paper-item#^1.0.0",
     "paper-material": "PolymerElements/paper-material#^1.0.0",
     "paper-progress": "PolymerElements/paper-progress#^1.0.2",
     "paper-styles": "PolymerElements/paper-styles#^1.0.0",
-    "web-component-tester": "*"
+    "web-component-tester": "^4.0.0"
   },
-  "_release": "1.0.0",
+  "_release": "762b861d20",
   "_resolution": {
-    "type": "version",
-    "tag": "v1.0.0",
-    "commit": "518477127df994802d85926b88af7e4bf90d85fb"
+    "type": "commit",
+    "commit": "762b861d200442c03e12f4693c72423fa647f397"
   },
   "_source": "git://github.com/PolymerElements/platinum-bluetooth.git",
-  "_target": "^1.0.0",
+  "_target": "762b861d200442c03e12f4693c72423fa647f397",
   "_originalSource": "PolymerElements/platinum-bluetooth"
 }
