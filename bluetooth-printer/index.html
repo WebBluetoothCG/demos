@@ -255,7 +255,7 @@ limitations under the License.
             .then(device => {
               console.log('> Found ' + device.name);
               console.log('Connecting to GATT Server...');
-              return device.connectGATT();
+              return device.gatt.connect();
             })
             .then(server => server.getPrimaryService("000018f0-0000-1000-8000-00805f9b34fb"))
             .then(service => service.getCharacteristic("00002af1-0000-1000-8000-00805f9b34fb"))

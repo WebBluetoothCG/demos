@@ -486,7 +486,7 @@ limitations under the License.
               })
               .then(device => {
                 console.log('Connecting to GATT Server...');
-                return device.connectGATT();
+                return device.gatt.connect();
               })
               .then(server => {
                 console.log('> Found GATT server');
