@@ -27,7 +27,7 @@
       return navigator.bluetooth.requestDevice(options)
       .then(device => {
         this.device = device;
-        return device.connectGATT();
+        return device.gatt.connect();
       })
       .then(server => {
         this.server = server;

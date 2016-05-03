@@ -412,7 +412,7 @@ limitations under the License.
                 console.log('> carName=' + carName);
 
                 console.log('Connecting to GATT Server...');
-                return device.connectGATT();
+                return device.gatt.connect();
               })
               .then(server => {
                 console.log('> Found GATT server');
