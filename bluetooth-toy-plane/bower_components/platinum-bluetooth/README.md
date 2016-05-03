@@ -224,6 +224,15 @@ nearby bluetooth device advertising Battery service and whose name is
 </platinum-bluetooth-device>
 ```
 
+If you filter just by name, then you must use `optional-services-filter`
+to get access to any services:
+
+```html
+<platinum-bluetooth-device name=filter='foobar'
+                           optional-services-filter='["battery_service"]'>
+</platinum-bluetooth-device>
+```
+
 Disconnecting manually from a connected bluetooth device is pretty
 straightforward:
 

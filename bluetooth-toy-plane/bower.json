@@ -20,7 +20,7 @@
     "paper-progress": "PolymerElements/paper-progress#^1.0.2",
     "paper-slider": "PolymerElements/paper-slider#^1.0.4",
     "paper-styles": "PolymerElements/paper-styles#^1.0.11",
-    "platinum-bluetooth": "PolymerElements/platinum-bluetooth#762b861d200442c03e12f4693c72423fa647f397",
+    "platinum-bluetooth": "PolymerElements/platinum-bluetooth#2.1.0",
     "polymer": "Polymer/polymer#^1.1.2"
   }
 }
