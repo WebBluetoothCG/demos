@@ -9,11 +9,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../paper-material/paper-material.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../iron-image/iron-image.html">
+<link rel="import" href="../paper-material/paper-material.html">
+<link rel="import" href="../paper-styles/default-theme.html">
 
 <!--
-Material Design: <a href="http://www.google.com/design/spec/components/cards.html">Cards</a>
+Material design: [Cards](https://www.google.com/design/spec/components/cards.html)
 
 `paper-card` is a container with a drop shadow.
 
@@ -31,7 +33,7 @@ Example - top card image:
     <paper-card heading="Card Title" image="/path/to/image.png">
       ...
     </paper-card>
-    
+
 ### Accessibility
 
 By default, the `aria-label` will be set to the value of the `heading` attribute.
@@ -42,6 +44,7 @@ The following custom properties and mixins are available for styling:
 
 Custom property | Description | Default
 ----------------|-------------|----------
+`--paper-card-background-color` | The background color of the card | `--primary-background-color`
 `--paper-card-header-color` | The color of the header text | `#000`
 `--paper-card-header` | Mixin applied to the card header section | `{}`
 `--paper-card-header-text` | Mixin applied to the title in the card header section | `{}`
@@ -58,20 +61,16 @@ Custom property | Description | Default
 
 <dom-module id="paper-card">
   <template>
-    <style>
+    <style include="paper-material">
       :host {
         display: inline-block;
         position: relative;
         box-sizing: border-box;
-
-        background: #fff;
+        background-color: var(--paper-card-background-color, --primary-background-color);
         border-radius: 2px;
-        @apply(--paper-card);
-      }
 
-      paper-material {
-        border-radius: inherit;
-        @apply(--layout-fit);
+        @apply(--paper-font-common-base);
+        @apply(--paper-card);
       }
 
       /* IE 10 support for HTML5 hidden attr */
@@ -81,32 +80,41 @@ Custom property | Description | Default
 
       .header {
         position: relative;
+        border-top-left-radius: inherit;
+        border-top-right-radius: inherit;
+        overflow: hidden;
+
         @apply(--paper-card-header);
       }
 
-      .header img {
+      .header iron-image {
         width: 100%;
+        --iron-image-width: 100%;
         pointer-events: none;
+
         @apply(--paper-card-header-image);
       }
 
       .header .title-text {
         padding: 16px;
         font-size: 24px;
-        font-weight: bold;
+        font-weight: 400;
         color: var(--paper-card-header-color, #000);
+
         @apply(--paper-card-header-text);
       }
 
       .header .title-text.over-image {
         position: absolute;
         bottom: 0px;
+
         @apply(--paper-card-header-image-text);
       }
 
       :host ::content .card-content {
         padding: 16px;
         position:relative;
+
         @apply(--paper-card-content);
       }
 
@@ -114,75 +122,104 @@ Custom property | Description | Default
         border-top: 1px solid #e8e8e8;
         padding: 5px 16px;
         position:relative;
+
         @apply(--paper-card-actions);
       }
     </style>
 
-    <paper-material animated$="[[animatedShadow]]" elevation="[[elevation]]"></paper-material>
-
     <div class="header">
-      <img hidden$="[[!image]]" src="[[image]]">
+      <iron-image hidden$="[[!image]]" src="[[image]]" preload$="[[preloadImage]]" fade$="[[fadeImage]]"></iron-image>
       <div hidden$="[[!heading]]" class$="[[_computeHeadingClass(image)]]">[[heading]]</div>
     </div>
 
     <content></content>
   </template>
 
-</dom-module>
+  <script>
+    Polymer({
+      is: 'paper-card',
 
-<script>
+      properties: {
+        /**
+         * The title of the card.
+         */
+        heading: {
+          type: String,
+          value: '',
+          observer: '_headingChanged'
+        },
 
-  Polymer({
+        /**
+         * The url of the title image of the card.
+         */
+        image: {
+          type: String,
+          value: ''
+        },
 
-    is: 'paper-card',
+        /**
+         * When `true`, any change to the image url property will cause the
+         * `placeholder` image to be shown until the image is fully rendered.
+         */
+        preloadImage: {
+          type: Boolean,
+          value: false
+        },
 
-    properties: {
+        /**
+         * When `preloadImage` is true, setting `fadeImage` to true will cause the
+         * image to fade into place.
+         */
+        fadeImage: {
+          type: Boolean,
+          value: false
+        },
 
-      /**
-       * The title of the card.
-       */
-      heading: {
-        type: String,
-        value: '',
-        observer: '_headingChanged'
+        /**
+         * The z-depth of the card, from 0-5.
+         */
+        elevation: {
+          type: Number,
+          value: 1,
+          reflectToAttribute: true
+        },
+
+        /**
+         * Set this to true to animate the card shadow when setting a new
+         * `z` value.
+         */
+        animatedShadow: {
+          type: Boolean,
+          value: false
+        },
+
+        /**
+         * Read-only property used to pass down the `animatedShadow` value to
+         * the underlying paper-material style (since they have different names).
+         */
+        animated: {
+          type: Boolean,
+          reflectToAttribute: true,
+          readOnly: true,
+          computed: '_computeAnimated(animatedShadow)'
+        }
       },
 
-      /**
-       * The url of the title image of the card.
-       */
-      image: {
-        type: String,
-        value: ''
+      _headingChanged: function(heading) {
+        var label = this.getAttribute('aria-label');
+        this.setAttribute('aria-label', heading);
       },
 
-      /**
-       * The z-depth of the card, from 0-5.
-       */
-      elevation: {
-        type: Number,
-        value: 1
+      _computeHeadingClass: function(image) {
+        var cls = 'title-text';
+        if (image)
+          cls += ' over-image';
+        return cls;
       },
 
-      /**
-       * Set this to true to animate the card shadow when setting a new
-       * `z` value.
-       */
-      animatedShadow: {
-        type: Boolean,
-        value: false
+      _computeAnimated: function(animatedShadow) {
+        return animatedShadow;
       }
-    },
-
-    _headingChanged: function(heading) {
-      var label = this.getAttribute('aria-label');
-      this.setAttribute('aria-label', heading);
-    },
-
-    _computeHeadingClass: function(image) {
-      var cls = 'title-text';
-      if (image)
-        cls += ' over-image';
-      return cls;
-    }
-  });
-</script>
+    });
+  </script>
+</dom-module>
