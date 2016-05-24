@@ -265,9 +265,13 @@ limitations under the License.
           // Put device into developer mode by sending a special string to Anti DOS,
           // 7 to TX Power and 1 to Wake CPU on radio service.
           if (controlCharacteristic == null) {
-            navigator.bluetooth.requestDevice({
+              const serviceA = '22bb746f-2ba0-7554-2d6f-726568705327';
+              const serviceB = '22bb746f-2bb0-7554-2d6f-726568705327';
+              navigator.bluetooth.requestDevice({
               filters: [{
-                services: ['22bb746f-2bb0-7554-2d6f-726568705327']
+                services: [serviceA] // Some BB8 toys do not advertise serviceB.
+              }, {
+                services: [serviceB]
               }]
             })
             .then(device => {
@@ -278,7 +282,7 @@ limitations under the License.
             .then(server => {
               gattServer = server;
               // Get radio service
-              return gattServer.getPrimaryService("22bb746f-2bb0-7554-2d6f-726568705327");
+              return gattServer.getPrimaryService(serviceB);
             })
             .then(service => {
               // Developer mode sequence is sent to the radio service
