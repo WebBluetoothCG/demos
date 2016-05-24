@@ -265,7 +265,7 @@ limitations under the License.
           // Put device into developer mode by sending a special string to Anti DOS,
           // 7 to TX Power and 1 to Wake CPU on radio service.
           if (controlCharacteristic == null) {
-              navigator.bluetooth.requestDevice({
+            navigator.bluetooth.requestDevice({
               filters: [{
                 services: ['22bb746f-2bb0-7554-2d6f-726568705327']
               }, {
