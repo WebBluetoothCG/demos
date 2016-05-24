@@ -42,20 +42,6 @@
           server.getPrimaryService('battery_service').then(service => {
             return this._cacheCharacteristic(service, 'battery_level')
           }),
-          // TODO: Uncomment when device_information service is actually
-          // available in Chrome OS. http://crbug.com/532930
-          /*
-          server.getPrimaryService('device_information').then(service => {
-            return Promise.all([
-              this._cacheCharacteristic(service, 'serial_number_string'),
-              this._cacheCharacteristic(service, 'hardware_revision_string'),
-              this._cacheCharacteristic(service, 'firmware_revision_string'),
-              this._cacheCharacteristic(service, 'software_revision_string'),
-              this._cacheCharacteristic(service, 'manufacturer_name_string'),
-              this._cacheCharacteristic(service, 'pnp_id'),
-            ])
-          }),
-          */
         ]);
       })
     }
@@ -108,33 +94,6 @@
     getBatteryLevel() {
       return this._readCharacteristicValue('battery_level')
       .then(data => data.getUint8(0));
-    }
-
-    /* Device Info Service */
-
-    getSerialNumber() {
-      return this._readCharacteristicValue('serial_number_string')
-      .then(this._decodeString);
-    }
-    getHardwareRevision() {
-      return this._readCharacteristicValue('hardware_revision_string')
-      .then(this._decodeString);
-    }
-    getFirmwareRevision() {
-      return this._readCharacteristicValue('firmware_revision_string')
-      .then(this._decodeString);
-    }
-    getSoftwareRevision() {
-      return this._readCharacteristicValue('software_revision_string')
-      .then(this._decodeString);
-    }
-    getManufacturerName() {
-      return this._readCharacteristicValue('manufacturer_name_string')
-      .then(this._decodeString);
-    }
-    getPnpID() {
-      return this._readCharacteristicValue('pnp_id')
-      .then(this._decodeString);
     }
 
     /* Utils */
