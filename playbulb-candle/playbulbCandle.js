@@ -19,6 +19,7 @@
       this.device = null;
       this.server = null;
       this._characteristics = new Map();
+      this._isEffectSet = false;
       this._debug = false;
     }
     connect() {
@@ -57,19 +58,35 @@
       return this._writeCharacteristicValue(CANDLE_DEVICE_NAME_UUID, data)
     }
     setColor(r, g, b) {
-      let data = [0x00, r, g, b];
-      return this._writeCharacteristicValue(CANDLE_COLOR_UUID, new Uint8Array(data))
-      .then(() => [r,g,b]); // Returns color when fulfilled.
+      return Promise.resolve()
+      .then(_ => {
+        if (this._isEffectSet) {
+          // Turn off Color Effect first.
+          let data = [0x00, r, g, b, 0x05, 0x00, 0x01, 0x00];
+          return this._writeCharacteristicValue(CANDLE_EFFECT_UUID, new Uint8Array(data))
+        }
+      })
+      .then(_ => {
+        let data = [0x00, r, g, b];
+        return this._writeCharacteristicValue(CANDLE_COLOR_UUID, new Uint8Array(data))
+      })
+      .then(_ => [r,g,b]); // Returns color when fulfilled.
     }
     setCandleEffectColor(r, g, b) {
       let data = [0x00, r, g, b, 0x04, 0x00, 0x01, 0x00];
       return this._writeCharacteristicValue(CANDLE_EFFECT_UUID, new Uint8Array(data))
-      .then(() => [r,g,b]); // Returns color when fulfilled.
+      .then(_ => {
+        this._isEffectSet = true;
+        return [r,g,b]; // Returns color when fulfilled.
+      });
     }
     setFlashingColor(r, g, b) {
       let data = [0x00, r, g, b, 0x00, 0x00, 0x1F, 0x00];
       return this._writeCharacteristicValue(CANDLE_EFFECT_UUID, new Uint8Array(data))
-      .then(() => [r,g,b]); // Returns color when fulfilled.
+      .then(_ => {
+        this._isEffectSet = true;
+        return [r,g,b]; // Returns color when fulfilled.
+      });
     }
     setPulseColor(r, g, b) {
       // We have to correct user color to make it look nice for real...
@@ -78,15 +95,24 @@
       let newBlue = Math.min(Math.round(b / 64) * 64, 255);
       let data = [0x00, newRed, newGreen, newBlue, 0x01, 0x00, 0x09, 0x00];
       return this._writeCharacteristicValue(CANDLE_EFFECT_UUID, new Uint8Array(data))
-      .then(() => [r,g,b]); // Returns color when fulfilled.
+      .then(_ => {
+        this._isEffectSet = true;
+        return [r,g,b]; // Returns color when fulfilled.
+      });
     }
     setRainbow() {
       let data = [0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x01, 0x00];
-      return this._writeCharacteristicValue(CANDLE_EFFECT_UUID, new Uint8Array(data));
+      return this._writeCharacteristicValue(CANDLE_EFFECT_UUID, new Uint8Array(data))
+      .then(_ => {
+        this._isEffectSet = true;
+      });
     }
     setRainbowFade() {
       let data = [0x01, 0x00, 0x00, 0x00, 0x03, 0x00, 0x26, 0x00];
-      return this._writeCharacteristicValue(CANDLE_EFFECT_UUID, new Uint8Array(data));
+      return this._writeCharacteristicValue(CANDLE_EFFECT_UUID, new Uint8Array(data))
+      .then(_ => {
+        this._isEffectSet = true;
+      });
     }
 
     /* Battery Service */
