@@ -1,0 +1,222 @@
+<!doctype html>
+<!--
+Copyright 2015 Google Inc. All Rights Reserved.
+Copyright 2016 Nimble Ape Ltd. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<html>
+  <head>
+    <title>Microbit LED Scrolling Text</title>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+
+    <!-- Polymer components -->
+    <link rel="import" href="bower_components/paper-progress/paper-progress.html">
+    <link rel="import" href="bower_components/paper-slider/paper-slider.html">
+    <link rel="import" href="bower_components/paper-button/paper-button.html">
+    <link rel="import" href="bower_components/paper-card/paper-card.html">
+    <link rel="import" href="bower_components/paper-dialog/paper-dialog.html">
+    <link rel="import" href="bower_components/paper-input/paper-input.html">
+    <link rel="import" href="bower_components/paper-input/paper-input-container.html">
+    <link rel="import" href="bower_components/paper-input/paper-input-error.html">
+    <link rel="import" href="bower_components/paper-input/paper-input-char-counter.html">
+    <link rel="import" href="bower_components/paper-input/paper-textarea.html">
+
+    <link rel="import" href="bower_components/paper-styles/color.html">
+    <link rel="stylesheet" href="bower_components/paper-styles/demo.css">
+
+    <style is="custom-style">
+      paper-progress {
+        width: 100%;
+      }
+      paper-progress.blue {
+        paper-progress-active-color: var(--paper-light-blue-500);
+        paper-progress-secondary-color: var(--paper-light-blue-100);
+      }
+      paper-slider {
+        width: 100%;
+      }
+      paper-slider.blue {
+        paper-slider-active-color: var(--paper-light-blue-500);
+        paper-slider-knob-color: var(--paper-light-blue-500);
+      }
+      paper-button {
+        display: block;
+        margin-bottom: 2px;
+      }
+      paper-button.colorful {
+        color: #4285f4;
+      }
+      paper-button[raised].colorful {
+        background: #4285f4;
+        color: #fff;
+      }
+      paper-button.blue {
+        color: var(--paper-light-blue-500);
+        paper-button-flat-focus-color: var(--paper-light-blue-50);
+      }
+      body {
+        background-color: var(--paper-grey-50);
+      }
+      #cards {
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 400px;
+      }
+      paper-card {
+        margin-bottom: 5px;
+        margin-top: 5px;
+        width: 100%;
+      }
+      paper-card#logo {
+        @apply(--layout-vertical);
+        @apply(--layout-center);
+      }
+    </style>
+  </head>
+  <body unresolved>
+    <div id="cards">
+      <paper-card heading="Microbit LED Scrolling Text">
+        <div class="card-content">
+          <paper-progress id="progress" indeterminate></paper-progress>
+        </div>
+      </paper-card>
+
+      <paper-card>
+        <div class="card-content">
+          <paper-textarea id="message" label="Enter Message"></paper-textarea>
+        </div>
+      </paper-card>
+
+      <paper-card>
+        <div class="card-content">
+          <paper-button id="send" raised class="colorful">Send</paper-button>
+        </div>
+      </paper-card>
+
+      <paper-card>
+        <div class="card-content" id="disconnectContent">
+          <paper-button id="disconnect" raised class="colorful">Disconnect</paper-button>
+        </div>
+      </paper-card>
+
+      <paper-dialog id="dialog">
+        <h2>Error</h2>
+        <p>Could not connect to bluetooth device!</p>
+      </paper-dialog>
+
+      <paper-dialog id="dialogDisconnectError">
+        <h2>Error</h2>
+        <p>Could not disconnect from the bluetooth device.</p>
+      </paper-dialog>
+    </div>
+
+    <script>
+      'use strict';
+      document.addEventListener('WebComponentsReady', function() {
+        let progress = document.querySelector('#progress');
+        let dialog = document.querySelector('#dialog');
+        let dialogDisconnectError = document.querySelector('#dialogDisconnectError');
+        let message = document.querySelector('#message');
+        let sendButton = document.querySelector('#send');
+        let disconnectContent = document.querySelector('#disconnectContent');
+        let disconnectButton = document.querySelector('#disconnect');
+        let gattServer;
+        let ledServiceUUID = 'e95dd91d-251d-470a-a062-fa1922dfa9a8';
+        let textCharacteristic;
+        let index = 0;
+        let data;
+        progress.hidden = true;
+        disconnectContent.hidden = true;
+
+        function handleError(error) {
+          console.log(error);
+          progress.hidden = true;
+          textCharacteristic = null;
+          dialog.open();
+        }
+
+        function handleDisconnectError (error) {
+          console.log(error);
+          dialogDisconnectError.open();
+        }
+
+        function sendTextData() {
+          // Get the bytes for the text
+          let encoder = new TextEncoder("utf-8");
+          let text = encoder.encode(message.value);
+          return textCharacteristic.writeValue(text).then(() => {
+            console.log('Wrote ', message.value, 'to the microbit LED display');
+            message.value = '';
+          });
+        }
+
+        function sendData() {
+          sendTextData()
+          .then(() => {
+            progress.hidden = true;
+          })
+          .catch(handleError);
+        }
+
+        disconnectButton.addEventListener('click', function () {
+          if (gattServer && gattServer.disconnect) {//disconnect support isnt everywhere
+            gattServer.disconnect();
+            console.log('disconnected');
+            disconnectContent.hidden = true;
+          } else {
+            handleDisconnectError();
+          }
+        });
+
+        sendButton.addEventListener('click', function () {
+          progress.hidden = false;
+          if (textCharacteristic == null) {
+            navigator.bluetooth.requestDevice({
+              filters: [{
+                namePrefix: "BBC"
+              }],
+              optionalServices: [ledServiceUUID]
+            })
+            .then(device => {
+              console.log('> Found ' + device.name);
+              console.log('Connecting to GATT Server...');
+              return device.gatt.connect();
+            })
+            .then(server => {
+              disconnectContent.hidden = false;
+              gattServer = server
+              return server.getPrimaryService(ledServiceUUID);
+            })
+            .then(service => service.getCharacteristic('e95d93ee-251d-470a-a062-fa1922dfa9a8'))
+            .then(characteristic => {
+              // Cache the characteristic
+              textCharacteristic = characteristic;
+              sendData();
+            })
+            .catch(handleError);
+          } else {
+            sendData();
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
