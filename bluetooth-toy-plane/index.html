@@ -17,12 +17,15 @@ limitations under the License.
 <html>
   <head>
     <title>Bluetooth Toy Plane</title>
+    <meta name="description" content="Control a toy plane with a Web Bluetooth app.">
 
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <meta http-equiv="origin-trial" content="AilW+Gn/JZF5Y9zW0oA8AatCuI4dzSb4wNKjq2/AYlaTuFiZLYA31PQADc3tjgAcms/ZwzAuXY+rd5c39vdQrQEAAABjeyJvcmlnaW4iOiAiaHR0cHM6Ly93ZWJibHVldG9vdGhjZy5naXRodWIuaW86NDQzIiwgImZlYXR1cmUiOiAiV2ViQmx1ZXRvb3RoIiwgImV4cGlyeSI6IDE0NjM3NTY2MTh9">
 
     <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
 
@@ -32,8 +35,7 @@ limitations under the License.
     <link rel="import" href="bower_components/paper-button/paper-button.html">
     <link rel="import" href="bower_components/paper-card/paper-card.html">
     <link rel="import" href="bower_components/paper-dialog/paper-dialog.html">
-    <link rel="import" href="bower_components/platinum-bluetooth/platinum-bluetooth-device.html">
-    <link rel="import" href="bower_components/platinum-bluetooth/platinum-bluetooth-characteristic.html">
+    <link rel="import" href="bower_components/platinum-bluetooth/platinum-bluetooth-elements.html">
 
     <link rel="import" href="bower_components/paper-styles/color.html">
     <link rel="stylesheet" href="bower_components/paper-styles/demo.css">
@@ -135,17 +137,19 @@ limitations under the License.
       </paper-dialog>
     </div>
 
-    <platinum-bluetooth-device services-filter='["f000ffc0-0451-4000-b000-000000000000"]' id="plane-device">
-      <platinum-bluetooth-characteristic id="engineCharacteristic"
-        service="75b64e51-f181-4ed1-921a-476090d80ba7"
-        characteristic="75b64e51-f184-4ed1-921a-476090d80ba7"
-        auto-write>
-      </platinum-bluetooth-characteristic>
-      <platinum-bluetooth-characteristic id="rudderCharacteristic"
-        service="75b64e51-f181-4ed1-921a-476090d80ba7"
-        characteristic="75b64e51-f185-4ed1-921a-476090d80ba7"
-        auto-write>
-      </platinum-bluetooth-characteristic>
+    <platinum-bluetooth-device id="plane-device"
+                               name-filter="TailorToys PowerUp"
+                               optional-services-filter='["75b64e51-f181-4ed1-921a-476090d80ba7"]'>
+      <platinum-bluetooth-service service="75b64e51-f181-4ed1-921a-476090d80ba7">
+        <platinum-bluetooth-characteristic id="engineCharacteristic"
+          characteristic="75b64e51-f184-4ed1-921a-476090d80ba7"
+          auto-write>
+        </platinum-bluetooth-characteristic>
+        <platinum-bluetooth-characteristic id="rudderCharacteristic"
+          characteristic="75b64e51-f185-4ed1-921a-476090d80ba7"
+          auto-write>
+        </platinum-bluetooth-characteristic>
+      </platinum-bluetooth-service>
     </platinum-bluetooth-device>
 
     <script>

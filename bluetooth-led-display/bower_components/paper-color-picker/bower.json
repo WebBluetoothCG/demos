@@ -1,0 +1,27 @@
+{
+  "name": "paper-color-picker",
+  "homepage": "https://github.com/David-Mulder/paper-color-picker",
+  "authors": [
+    "David Mulder",
+    "Dennis Kugelmann"
+  ],
+  "description": "A paper color picker inspired by Material Design",
+  "main": "paper-color-picker.html",
+  "keywords": [
+    "web-components",
+    "polymer",
+    "color-picker",
+    "material-design"
+  ],
+  "license": "https://github.com/David-Mulder/paper-color-picker/blob/master/LICENSE",
+  "dependencies": {
+    "paper-dialog": "PolymerElements/paper-dialog#~1.0.3",
+    "iron-component-page": "PolymerElements/iron-component-page#~1.1.2",
+    "paper-slider": "PolymerElements/paper-slider#~1.0.8",
+    "neon-animation": "PolymerElements/neon-animation#~1.0.8",
+    "paper-styles": "PolymerElements/paper-styles#~1.0.13",
+    "whenever.js": "David-Mulder/whenever.js#~0.0.1",
+    "iron-form-element-behavior": "PolymerElements/iron-form-element-behavior#~1.0.6",
+    "iron-resizable-behavior": "PolymerElements/iron-resizable-behavior#~1.0.2"
+  }
+}

@@ -1,0 +1,68 @@
+<!doctype html>
+<html>
+	<head>
+
+		<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+
+		<title>paper-color-input</title>
+
+		<script src="../../webcomponentsjs/webcomponents.js"></script>
+
+		<link href="../../paper-dialog/paper-dialog.html" rel="import">
+		<link href="../../paper-button/paper-button.html" rel="import">
+		<link href="../../paper-input/paper-input.html" rel="import">
+
+		<link href="../paper-color-circle.html" rel="import">
+		<link href="../paper-color-picker.html" rel="import">
+		<link href="../paper-color-input.html" rel="import">
+
+		<style shim-shadowdom>
+
+			body {
+				font-family: RobotoDraft, 'Helvetica Neue', Helvetica, Arial;
+				font-size: 14px;
+				margin: 0;
+				padding: 24px;
+				-webkit-tap-highlight-color: rgba(0,0,0,0);
+				-webkit-touch-callout: none;
+			}
+			paper-color-circle{
+				width:200px;
+				height:200px;
+			}
+			section{
+				padding-bottom:30px;
+			}
+			.buttons{
+				padding-left:20px;
+			}
+			.buttons > div{
+				float:left;
+			}
+		</style>
+
+	</head>
+	<body unresolved>
+
+		<section>
+			<h1><code>&lt;paper-color-circle&gt;</code></h1>
+
+			<paper-color-circle style="margin:20px;"></paper-color-circle>
+			<paper-color-circle style="margin:20px;" type="hsl"></paper-color-circle><br />
+			<paper-color-circle style="margin:20px;" shape="square"></paper-color-circle>
+			<paper-color-circle style="margin:20px;" type="hsl" shape="square"></paper-color-circle><br />
+			<paper-color-circle style="margin:20px;" shape="huebox"></paper-color-circle>
+			<paper-color-circle style="margin:20px;" type="hsl" shape="huebox"></paper-color-circle><br />
+			<paper-color-circle style="margin:20px;" no-aa-border></paper-color-circle>
+			<paper-color-circle style="margin:20px;" coloured-aa-border=""></paper-color-circle><br>
+
+		</section>
+		<section>
+			<h1>Resizing circle</h1>
+			<div style="text-align: center; padding: 20px;">
+				<paper-color-circle style="width:100%;height:500px;"></paper-color-circle>
+			</div>
+		</section>
+
+	</body>
+</html>

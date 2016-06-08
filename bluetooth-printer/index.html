@@ -17,12 +17,15 @@ limitations under the License.
 <html>
   <head>
     <title>Bluetooth Printer</title>
+    <meta name="description" content="Print text and images to a Bluetooth Printer with a Web Bluetooth app.">
 
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <meta http-equiv="origin-trial" content="AilW+Gn/JZF5Y9zW0oA8AatCuI4dzSb4wNKjq2/AYlaTuFiZLYA31PQADc3tjgAcms/ZwzAuXY+rd5c39vdQrQEAAABjeyJvcmlnaW4iOiAiaHR0cHM6Ly93ZWJibHVldG9vdGhjZy5naXRodWIuaW86NDQzIiwgImZlYXR1cmUiOiAiV2ViQmx1ZXRvb3RoIiwgImV4cGlyeSI6IDE0NjM3NTY2MTh9">
 
     <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
 
@@ -252,7 +255,7 @@ limitations under the License.
             .then(device => {
               console.log('> Found ' + device.name);
               console.log('Connecting to GATT Server...');
-              return device.connectGATT();
+              return device.gatt.connect();
             })
             .then(server => server.getPrimaryService("000018f0-0000-1000-8000-00805f9b34fb"))
             .then(service => service.getCharacteristic("00002af1-0000-1000-8000-00805f9b34fb"))

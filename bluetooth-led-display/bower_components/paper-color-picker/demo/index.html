@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+<head>
+
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+
+  <title>paper-color-input</title>
+
+  <script src="../../webcomponentsjs/webcomponents.js"></script>
+
+  <link href="../../paper-dialog/paper-dialog.html" rel="import">
+  <link href="../../paper-button/paper-button.html" rel="import">
+  <link href="../../paper-input/paper-input.html" rel="import">
+
+  <link href="../paper-color-circle.html" rel="import">
+  <link href="../paper-color-picker.html" rel="import">
+  <link href="../paper-color-input.html" rel="import">
+
+  <style shim-shadowdom>
+
+    body {
+      font-family: RobotoDraft, 'Helvetica Neue', Helvetica, Arial;
+      font-size: 14px;
+      margin: 0;
+      padding: 24px;
+      -webkit-tap-highlight-color: rgba(0,0,0,0);
+      -webkit-touch-callout: none;
+    }
+    paper-color-circle{
+      width:200px;
+      height:200px;
+    }
+    section{
+      padding-bottom:30px;
+    }
+    .buttons{
+      padding-left:20px;
+    }
+    .buttons > div{
+      float:left;
+    }
+  </style>
+
+</head>
+<body unresolved>
+
+  <section>
+    <h1><code>&lt;paper-color-input&gt;</code></h1>
+    <div style="width: 300px;">
+      <paper-color-input label="Pick a color..."></paper-color-input>
+      <paper-color-input value='{"red":255,"green":155,"blue":55}' label="My favourite color"></paper-color-input>
+      <paper-color-input value='{"red":255,"green":155,"blue":55}' shape="huebox" label="Color with hue picker"></paper-color-input>
+      <paper-color-input value='{"red":255,"green":155,"blue":55,"alpha": 0.5}' shape="huebox" label="Color with hue picker and alpha" always-show-alpha allow-alpha></paper-color-input>
+      <paper-color-input value='{"red":0,"green":255,"blue":0}' shape="huebox" label="Color with hue picker"></paper-color-input>
+      <paper-color-input value='{"red":12,"green":34,"blue":56}' shape="square" label="Color with square picker"></paper-color-input>
+      <paper-color-input value='{"red":12,"green":34,"blue":56}' shape="square" label="Input with [with-description]" with-description allow-alpha></paper-color-input>
+    </div>
+  </section>
+
+  <section>
+    <h1><code>&lt;paper-color-circle&gt;</code></h1>
+
+    <a href="paper-color-circle.html" style="padding-left:20px;">See paper-color-circle.html</a>
+
+  </section>
+
+  <section>
+    <h1><code>&lt;paper-color-picker&gt;</code></h1>
+
+    <br>
+
+    <a href="paper-color-picker.html" style="padding-left:20px;">See paper-color-picker.html</a>
+
+  </section>
+  
+</body>
+</html>

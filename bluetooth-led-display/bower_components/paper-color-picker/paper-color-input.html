@@ -1,0 +1,232 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-form-element-behavior/iron-form-element-behavior.html">
+<link rel="import" href="../paper-input/paper-input-container.html">
+<link rel="import" href="./paper-color-picker.html">
+
+<!--
+This component contains 3 elements:
+
+ - `<paper-color-circle>` : An element drawing a color space onto a canvas
+ - `<paper-color-picker>` : An element containing a material design picker dialog for colors
+ - `<paper-color-input>` : An element that displays an input that allows changing of the color through a color picker dialog.
+
+Shape and colour spaces
+---
+There are three different main configurations all 3 elements allow: `circle`, `square`
+ or `huebox`. This is called the `[shape]` of the color circle. Additionally in the case of `circle` and `square` it can
+  be specified whether the colours should be generated from the `hsv` or `hsl` colour space.
+
+    <paper-color-input shape="square" type="hsl"></paper-color-input>
+
+
+@demo demo/index.html
+-->
+
+<dom-module id="paper-color-input">
+	<template>
+		<style>
+			:host {
+			}
+			#colorPreview{
+				height: 16px;
+				width: 16px;
+				border: 1px solid rgba(0,0,0,.1);
+				border-radius: 1px;
+				margin: 2px;
+				position: relative;
+				background-image: linear-gradient(to right, #ffffff 1%,#ffffff 50%,#eee 50%,#eee 100%), linear-gradient(to right, #eee 1%,#eee 50%,#ffffff 50%,#ffffff 100%);
+				background-size: 16px 8px,  16px 8px;
+				background-repeat: repeat-x, repeat;
+			}
+			#color{
+				position: absolute;
+				left: 0px;
+				top: 0px;
+				right: 0px;
+				bottom: 0px;
+			}
+			#noColor{
+				width: 22.6px;
+				height: 1px;
+				border-top: 1px solid rgba(0,0,0,.1);
+				transform-origin: 0px 0px;
+				transform: translateY(15.5px) rotate(-45deg);
+			}
+			#input{
+				cursor: pointer;
+			}
+			span.dark{
+				font-size: 10px;
+				color: rgba(0,0,0,.8);
+				font-family: monospace;
+			}
+			span.light{
+				font-size: 10px;
+				font-family: monospace;
+				color: rgba(0,0,0,.3);
+			}
+		</style>
+		<paper-input-container id="input" always-float-label="{{_isValueDefined(value.*)}}">
+			<label>{{label}}</label>
+			<div class="paper-input-input">
+				<span>{{colorName}}</span>&nbsp;<!--
+				--><template is="dom-if" if="{{withDescription}}"><!--
+					--><span class="light">rgb<template is="dom-if" if="{{allowAlpha}}">a</template>(</span><span class="dark">{{value.red}}</span><span class="light">, </span><span class="dark">{{value.green}}</span><span class="light">, </span><span class="dark">{{value.blue}}</span><template is="dom-if" if="{{allowAlpha}}"><span class="light">, </span><span class="dark">{{value.alpha}}</span></template><span class="light">)</span>
+			</template>
+			</div>
+			<div id="colorPreview" suffix>
+				<div id="color" style$="{{_computeBackgroundColor(value.*)}}"></div>
+				<div id="noColor" hidden="{{_isValueDefined(value.*)}}"></div>
+			</div>
+		</paper-input-container>
+
+		<paper-color-picker id="picker" color="{{value}}" color-as-string="{{colorName}}" shape="{{shape}}" type="{{type}}" allow-alpha="{{allowAlpha}}" always-show-alpha="{{alwaysShowAlpha}}"></paper-color-picker>
+
+	</template>
+
+	<script>
+		Polymer({
+			is: 'paper-color-input',
+			properties: {
+				/**
+				 * The currently picked color. This is an object with a `red`, `green` and `blue` property.
+				 *
+				 * @attribute label
+				 * @type String
+				 * @default ''
+				 */
+				value: {
+					type: Object,
+					notify: true
+				},
+				valueAsHex: {
+					type: String,
+					notify: true,
+					observer: '_setValueFromHex'
+				},
+				/**
+				 * The label for this input.
+				 *
+				 * @attribute label
+				 * @type String
+				 * @default ''
+				 */
+				label: {
+					type: String,
+					value: ''
+				},
+				/**
+				 * The name of the colour as shown in the input field
+				 *
+				 * @attribute color-name
+				 * @type String
+				 * @default ''
+				 */
+				colorName: String,
+
+				/**
+				 * *square*, *circle* or *huebox*
+				 *
+				 * @attribute shape
+				 * @type string
+				 * @default 'circle'
+				 */
+				shape: {
+					type: String,
+					value: 'circle',
+					notify: true
+				},
+
+				/**
+				 * *hsv* or *hsl*
+				 *
+				 * @attribute type
+				 * @type string
+				 * @default 'hsv'
+				 */
+				type: {
+					type: String,
+					value: 'hsv',
+					notify: true
+				},
+				/**
+				 * Whether to allow changing the transparency of the picked color
+				 */
+				allowAlpha: Boolean,
+				/**
+				 * Whether to show the color also as a string
+				 */
+				withDescription: Boolean,
+				/**
+				 * Show alpha slider always instead of only in the advanced settings
+				 */
+				alwaysShowAlpha: Boolean,
+			},
+			behaviors: [
+				/* Polymer.IronFormElementBehavior */ // disabled till https://github.com/Polymer/polymer/issues/3167 gets fixed
+			],
+			observers: [
+				'_setValueAsHexFromValue(value.*)'
+			],
+			listeners: {
+				'input.tap': 'openColorPicker'
+			},
+			// Element Lifecycle
+			ready: function() {
+				if(this._isValueDefined()){
+					this.$.picker.set('immediateColor', this.value);
+					var listenOnce;
+					this.$.picker.addEventListener('immediate-color-as-string-changed', listenOnce = function(){
+						//this.colorName = this.$.picker.immediateColorAsString;
+						this.$.picker.setColor();
+						this.$.picker.removeEventListener('immediate-color-as-string-changed', listenOnce);
+					}.bind(this));
+				}
+			},
+			openColorPicker: function(){
+				this.$.picker.open();
+			},
+			_computeBackgroundColor: function(){
+				if(!this._isValueDefined()){
+					return 'background: white';
+				}
+				if(typeof this.value.alpha === 'undefined'){
+					this.value.alpha = 1;
+				}
+				return 'background: rgba('+this.value.red+', '+this.value.green+','+this.value.blue+', '+this.value.alpha+')';
+			},
+			_isValueDefined: function(){
+				return this.value.red >= 0 && this.value.green >= 0 && this.value.blue >= 0;
+			},
+			_setValueAsHexFromValue: function(){
+				if(this._isValueDefined()){
+					var hex = '#';
+					var value = this.value;
+					['red', 'green', 'blue'].forEach(function(c){
+						var h = value[c].toString(16);
+						l = h.length;
+						hex += l < 2 ? '0' : '';
+						hex += l < 1 ? '0' : '';
+						hex += h;
+					});
+					this.set('valueAsHex', hex);
+				}
+			},
+			_setValueFromHex: function(){
+				var hex = this.valueAsHex;
+				var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+				var hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+					return r + r + g + g + b + b;
+				});
+
+				var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+				if(typeof this.value === 'undefined'){
+					this.set('value', {});
+				}
+				this.set('value.red', parseInt(result[1], 16));
+				this.set('value.green', parseInt(result[2], 16));
+				this.set('value.blue', parseInt(result[3], 16));
+			}
+		});
+	</script>
+</dom-module>

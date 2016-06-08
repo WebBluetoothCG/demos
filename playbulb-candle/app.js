@@ -44,7 +44,14 @@ img.onload = function() {
   canvas.height = 300 * devicePixelRatio;
   canvas.style.width = "300px";
   canvas.style.height = "300px";
-  canvas.addEventListener('click', function(evt) {
+
+  canvas.addEventListener('click', draw);
+  canvas.addEventListener('touchmove', function(evt) {
+    evt.preventDefault();
+    draw(evt.targetTouches[0]);
+  });
+
+  function draw(evt) {
     // Refresh canvas in case user zooms and devicePixelRatio changes.
     canvas.width = 300 * devicePixelRatio;
     canvas.height = 300 * devicePixelRatio;
@@ -67,7 +74,7 @@ img.onload = function() {
     context.shadowBlur = 4 * devicePixelRatio;
     context.fillStyle = 'white';
     context.fill();
-  });
+  };
 
   context.drawImage(img, 0, 0, canvas.width, canvas.height);
 }
@@ -81,7 +88,13 @@ document.querySelector('#pulse').addEventListener('click', changeColor);
 document.querySelector('#rainbow').addEventListener('click', changeColor);
 document.querySelector('#rainbowFade').addEventListener('click', changeColor);
 
+var colorChanging = false;
+
 function changeColor() {
+  if (colorChanging) {
+    return;
+  }
+  colorChanging = true;
   var effect = document.querySelector('[name="effectSwitch"]:checked').id;
   switch(effect) {
     case 'noEffect':
@@ -114,7 +127,12 @@ function onColorChanged(rgb) {
   } else {
     console.log('Color changed');
   }
+  colorChanging = false;
 }
+
+window.addEventListener('unhandledrejection', function() {
+  colorChanging = false;
+});
 
 window.onload = function() {
   var connect = document.getElementById("connect");
@@ -127,4 +145,5 @@ window.onload = function() {
     connect.style.display = "block";
     no_bt.style.display = "none";
   }
+  screen.orientation.lock('portrait').catch(e => e);
 };

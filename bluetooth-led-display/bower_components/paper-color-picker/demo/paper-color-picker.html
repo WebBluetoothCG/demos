@@ -1,0 +1,114 @@
+<!doctype html>
+<html>
+	<head>
+
+		<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+
+		<title>paper-color-input</title>
+
+		<script src="../../webcomponentsjs/webcomponents.js"></script>
+
+		<link href="../../paper-dialog/paper-dialog.html" rel="import">
+		<link href="../../paper-button/paper-button.html" rel="import">
+		<link href="../../paper-input/paper-input.html" rel="import">
+
+		<link href="../paper-color-circle.html" rel="import">
+		<link href="../paper-color-picker.html" rel="import">
+		<link href="../paper-color-input.html" rel="import">
+
+		<style shim-shadowdom>
+
+			body {
+				font-family: RobotoDraft, 'Helvetica Neue', Helvetica, Arial;
+				font-size: 14px;
+				margin: 0;
+				padding: 24px;
+				-webkit-tap-highlight-color: rgba(0,0,0,0);
+				-webkit-touch-callout: none;
+			}
+			paper-color-circle{
+				width:200px;
+				height:200px;
+			}
+			section{
+				padding-bottom:30px;
+			}
+			.buttons{
+				padding-left:20px;
+			}
+		</style>
+
+	</head>
+	<body unresolved>
+
+		<section>
+			<h1><code>&lt;paper-color-picker&gt;</code></h1>
+
+			<br>
+
+			<div class="buttons">
+
+				<div>
+					<paper-button  onclick="this.parentElement.querySelector('paper-color-picker').open()">
+						Standard dialog
+					</paper-button>
+					<paper-color-picker></paper-color-picker>
+					<script>
+						document.querySelector('paper-color-picker').open()
+					</script>
+				</div>
+
+				<div>
+					<paper-button onclick="this.parentElement.querySelector('paper-color-picker').open()">
+						Square picker
+					</paper-button>
+
+					<paper-color-picker shape="square"></paper-color-picker>
+				</div>
+
+				<div>
+					<paper-button onclick="this.parentElement.querySelector('paper-color-picker').open()">
+						Hue box picker
+					</paper-button>
+
+					<paper-color-picker shape="huebox"></paper-color-picker>
+				</div>
+
+				<div>
+					<paper-button onclick="this.parentElement.querySelector('paper-color-picker').open()">
+						Standard HSV picker
+					</paper-button>
+
+					<paper-color-picker type="hsl"></paper-color-picker>
+				</div>
+
+				<div>
+					<paper-button onclick="this.parentElement.querySelector('paper-color-picker').open()">
+						Standard picker with set color
+					</paper-button>
+
+					<paper-color-picker immediate-color='{"red":255,"green":155,"blue":55}'></paper-color-picker>
+				</div>
+
+				<div>
+					<paper-button onclick="this.parentElement.querySelector('paper-color-picker').open()">
+						Standard picker with alpha
+					</paper-button>
+
+					<paper-color-picker immediate-color='{"red":255,"green":155,"blue":55, "alpha": 1}' allow-alpha></paper-color-picker>
+				</div>
+
+				<div>
+					<paper-button onclick="this.parentElement.querySelector('paper-color-picker').open()">
+						Standard picker with always visible alpha
+					</paper-button>
+
+					<paper-color-picker immediate-color='{"red":124,"green":25,"blue":36, "alpha": 0.5}' allow-alpha always-show-alpha></paper-color-picker>
+				</div>
+
+			</div>
+
+		</section>
+
+	</body>
+</html>

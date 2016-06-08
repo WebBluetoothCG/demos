@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+<head>
+
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+
+  <title>paper-input</title>
+
+  <script src="../../webcomponentsjs/webcomponents.js"></script>
+
+  <link href="../../paper-dialog/paper-dialog.html" rel="import">
+  <link href="../../paper-button/paper-button.html" rel="import">
+  <link href="../../paper-input/paper-input.html" rel="import">
+
+  <link href="../paper-color-circle.html" rel="import">
+  <link href="../paper-color-picker.html" rel="import">
+  <link href="../paper-color-input.html" rel="import">
+
+  <style shim-shadowdom>
+
+    body {
+      font-family: RobotoDraft, 'Helvetica Neue', Helvetica, Arial;
+      font-size: 14px;
+      margin: 0;
+      padding: 24px;
+      -webkit-tap-highlight-color: rgba(0,0,0,0);
+      -webkit-touch-callout: none;
+    }
+    paper-color-circle{
+      width:200px;
+      height:200px;
+    }
+    section{
+      padding-bottom:30px;
+    }
+    .buttons{
+      padding-left:20px;
+    }
+    .buttons > div{
+      float:left;
+    }
+  </style>
+
+</head>
+<body unresolved>
+
+  <section>
+    <h1>Dialog</h1>
+
+    <br>
+
+    <div class="buttons">
+
+      <div>
+        <paper-button raised onclick="this.parentElement.querySelector('paper-color-picker').open()">
+          Standard dialog
+        </paper-button>
+
+        <paper-color-picker no-full-names></paper-color-picker>
+      </div>
+
+    </div>
+
+  </section>
+  
+</body>
+</html>

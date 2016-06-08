@@ -1,4 +1,4 @@
-// Version 2
+// Version 7
 
 self.addEventListener('install', function(e) {
   e.waitUntil(
