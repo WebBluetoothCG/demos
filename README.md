@@ -1,6 +1,8 @@
 # Web Bluetooth Demos
 
-Hosted here: https://webbluetoothcg.github.io/demos/
+Check your [browser and platform implementation status](https://github.com/WebBluetoothCG/web-bluetooth/blob/gh-pages/implementation-status.md) first.
+
+### Hosted here: https://webbluetoothcg.github.io/demos/
 
 - [Bluetooth LED Display](/bluetooth-led-display/)
 - [Bluetooth Printer](/bluetooth-printer/)
