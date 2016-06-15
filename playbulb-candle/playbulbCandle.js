@@ -13,6 +13,7 @@
   const CANDLE_DEVICE_NAME_UUID = 0xFFFF;
   const CANDLE_COLOR_UUID = 0xFFFC;
   const CANDLE_EFFECT_UUID = 0xFFFB;
+  const CANDLE_BLOW_NOTIFICATIONS_UUID = 0x2A37;
 
   class PlaybulbCandle {
     constructor() {
@@ -38,6 +39,7 @@
               this._cacheCharacteristic(service, CANDLE_DEVICE_NAME_UUID),
               this._cacheCharacteristic(service, CANDLE_COLOR_UUID),
               this._cacheCharacteristic(service, CANDLE_EFFECT_UUID),
+              this._cacheCharacteristic(service, CANDLE_BLOW_NOTIFICATIONS_UUID),
             ])
           }),
           server.getPrimaryService('battery_service').then(service => {
@@ -114,6 +116,20 @@
         this._isEffectSet = true;
       });
     }
+    startBlowNotifications(listener) {
+      let characteristic = this._characteristics.get(CANDLE_BLOW_NOTIFICATIONS_UUID);
+      return characteristic.startNotifications()
+      .then(_ => {
+        characteristic.addEventListener('characteristicvaluechanged', listener);
+      });
+    }
+    stopBlowNotifications(listener) {
+      let characteristic = this._characteristics.get(CANDLE_BLOW_NOTIFICATIONS_UUID);
+      return characteristic.stopNotifications()
+      .then(_ => {
+        characteristic.removeEventListener('characteristicvaluechanged', listener);
+      });
+    }
 
     /* Battery Service */
 
@@ -134,8 +150,6 @@
       let characteristic = this._characteristics.get(characteristicUuid);
       return characteristic.readValue()
       .then(value => {
-        // In Chrome 50+, a DataView is returned instead of an ArrayBuffer.
-        value = value.buffer ? value : new DataView(value);
         if (this._debug) {
           for (var i = 0, a = []; i < value.byteLength; i++) { a.push(value.getUint8(i)); }
           console.debug('READ', characteristic.uuid, a);

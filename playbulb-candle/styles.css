@@ -55,7 +55,7 @@ body.connecting #loading {
   outline: none;
   margin: 12px 0;
 }
-#batteryLevel {
+#stats {
   background-color: #222222;
   margin: 12px 0;
   padding: 12px;

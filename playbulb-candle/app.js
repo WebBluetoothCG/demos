@@ -3,11 +3,13 @@ var r = g = b = 255; // White by default.
 document.querySelector('#connect').addEventListener('click', function() {
   document.querySelector('#state').classList.add('connecting');
   playbulbCandle.connect()
-  .then(() => {
+  .then(_ => {
     document.querySelector('#state').classList.remove('connecting');
     document.querySelector('#state').classList.add('connected');
+    document.querySelector('#blow').textContent = '';
     return playbulbCandle.getDeviceName().then(handleDeviceName)
-    .then(() => playbulbCandle.getBatteryLevel().then(handleBatteryLevel));
+    .then(_ => playbulbCandle.getBatteryLevel().then(handleBatteryLevel))
+    .then(_ => playbulbCandle.startBlowNotifications(handleBlowNotifications));
   })
   .catch(error => {
     // TODO: Replace with toast when snackbar lands.
@@ -31,6 +33,19 @@ document.querySelector('#deviceName').addEventListener('input', function() {
     console.error('Argh!', error);
   });
 });
+
+/* Blow notifications */
+
+function handleBlowNotifications(event) {
+  let v = event.target.value;
+  if (v.byteLength == 8 &&
+      v.getUint8(1) == 0 && v.getUint8(2) == 0 && v.getUint8(3) == 0) {
+    // If r,g,b colors are 0, this means the candle is off.
+    document.querySelector('#blow').textContent = 'Candle OFF';
+  } else {
+    document.querySelector('#blow').textContent = 'Candle ON';
+  }
+}
 
 /* Color picker */
 
