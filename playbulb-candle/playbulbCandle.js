@@ -23,14 +23,19 @@
       this._isEffectSet = false;
       this._debug = false;
     }
-    connect() {
+    request() {
       let options = {filters:[{services:[ CANDLE_SERVICE_UUID ]}],
                      optionalServices: ['battery_service']};
       return navigator.bluetooth.requestDevice(options)
       .then(device => {
         this.device = device;
-        return device.gatt.connect();
       })
+    }
+    connect() {
+      if (!this.device) {
+        return Promise.reject('Device is not connected.');
+      }
+      return this.device.gatt.connect()
       .then(server => {
         this.server = server;
         return Promise.all([
