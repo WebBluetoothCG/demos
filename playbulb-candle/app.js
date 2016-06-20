@@ -1,8 +1,11 @@
 var r = g = b = 255; // White by default.
 
 document.querySelector('#connect').addEventListener('click', function() {
-  document.querySelector('#state').classList.add('connecting');
-  playbulbCandle.connect()
+  playbulbCandle.request()
+  .then(_ => {
+    document.querySelector('#state').classList.add('connecting');
+    return playbulbCandle.connect();
+  })
   .then(_ => {
     document.querySelector('#state').classList.remove('connecting');
     document.querySelector('#state').classList.add('connected');
@@ -12,6 +15,7 @@ document.querySelector('#connect').addEventListener('click', function() {
     .then(_ => playbulbCandle.startBlowNotifications(handleBlowNotifications));
   })
   .catch(error => {
+    document.querySelector('#state').classList.remove('connecting');
     // TODO: Replace with toast when snackbar lands.
     console.error('Argh!', error);
   });
