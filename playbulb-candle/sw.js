@@ -1,33 +1,23 @@
-// Version 8
-
-self.addEventListener('install', function(e) {
-  e.waitUntil(
-    caches.open('playbulb-candle').then(function(cache) {
-      return cache.addAll([
-        '/demos/playbulb-candle/',
-        '/demos/playbulb-candle/index.html',
-        '/demos/playbulb-candle/styles.css',
-        '/demos/playbulb-candle/playbulbCandle.js',
-        '/demos/playbulb-candle/app.js',
-        '/demos/playbulb-candle/color-wheel.png',
-        '/demos/playbulb-candle/code.getmdl.io/1.0.4/material.green-light_green.min.css',
-        '/demos/playbulb-candle/code.getmdl.io/1.0.4/material.min.js',
-        'https://fonts.googleapis.com/icon?family=Material+Icons',
-      ]).then(function() {
-        return self.skipWaiting();
-      });
-    })
-  );
-});
-
-self.addEventListener('activate', function(event) {
-  event.waitUntil(self.clients.claim());
-});
+const version = "9";
 
 self.addEventListener('fetch', function(event) {
+  const request = event.request;
+  const url = new URL(event.request.url)
+
   event.respondWith(
-    caches.match(event.request).then(function(response) {
-      return response || fetch(event.request);
+   caches.open(version).then(cache => {
+      return cache.match(request).then(response => {
+        var fetchPromise = fetch(request).then(networkResponse => {
+          cache.put(request, networkResponse.clone());
+          return networkResponse;
+        });
+        // We need to ensure that the event doesn't complete until we
+        // know we have fetched the data
+        event.waitUntil(fetchPromise);
+
+        // Return the response from cache or wait for network.
+        return response || fetchPromise;
+      })
     })
   );
 });
