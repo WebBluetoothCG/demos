@@ -156,12 +156,23 @@ limitations under the License.
           progress.hidden = false;
           disableInput();
           Promise.resolve()
-          .then(_ => navigator.bluetooth.requestDevice({
-            filters: anyDeviceFilter(),
-            optionalServices: ['generic_access']
-          }))
+          .then(_ => {
+            if (!navigator.bluetooth)
+              throw "No Web Bluetooth support.";
+
+            return navigator.bluetooth.requestDevice({
+              filters: anyDeviceFilter(),
+              optionalServices: ['generic_access']
+            })
+          })
           .then(logProgress)
-          .then(device => device.gatt.connect())
+          .then(device => {
+            nameInput.value = "";
+            return device.gatt.connect().catch(error => {
+              logProgress(error);
+              throw "Unable to connect. Some devices refuse connections.";
+            });
+          })
           .then(logProgress)
           .then(server => server.getPrimaryService("generic_access"))
           .then(logProgress)
@@ -175,12 +186,12 @@ limitations under the License.
           .then(value => {
             window.value = value;
             nameInput.value = new TextDecoder("utf-8").decode(value);
-            enableInput();
+            if (window.deviceName.properties.write)
+              enableInput();
+            else
+              throw "Name is not writable on this device.";
           })
-          .catch(error => {
-            handleError(error);
-            nameInput.value = "";
-          })
+          .catch(handleError)
           .then(_ => progress.hidden = true)
         });
 
