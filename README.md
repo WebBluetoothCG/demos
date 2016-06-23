@@ -7,6 +7,7 @@ Check your [browser and platform implementation status](https://github.com/WebBl
 - [Bluetooth LED Display](/bluetooth-led-display/)
 - [Bluetooth Printer](/bluetooth-printer/)
 - [Bluetooth Racing Cars](/bluetooth-racing-cars/)
+- [Bluetooth Rename Tool](/bluetooth-rename/)
 - [Bluetooth Toy BB-8](/bluetooth-toy-bb8/)
 - [Bluetooth Toy Plane](/bluetooth-toy-plane/)
 - [Heart Rate Sensor](/heart-rate-sensor/)
