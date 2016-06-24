@@ -1,11 +1,9 @@
-const version = "10";
-
 self.addEventListener('fetch', function(event) {
   const request = event.request;
   const url = new URL(event.request.url)
 
   event.respondWith(
-   caches.open(version).then(cache => {
+   caches.open('playbulb-candle').then(cache => {
       return cache.match(request).then(response => {
         var fetchPromise = fetch(request).then(networkResponse => {
           cache.put(request, networkResponse.clone());
@@ -19,5 +17,17 @@ self.addEventListener('fetch', function(event) {
         return response || fetchPromise;
       })
     })
+  );
+});
+
+/* Clean up old caches */
+self.addEventListener('activate', function(event) {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.filter(cacheName => (cacheName !== 'playbulb-candle'))
+                  .map(cacheName => caches.delete(cacheName))
+      );
+    });
   );
 });
