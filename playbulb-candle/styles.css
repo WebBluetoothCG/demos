@@ -90,3 +90,21 @@ body.connecting #loading {
   color: #fff;
   background: #c33;
 }
+#view-source {
+  margin: 24px 0;
+}
+#view-source a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+  text-decoration: initial;
+}
+#view-source a img {
+  width: 16px;
+  height: 16px;
+  padding-right: 6px;
+}
+#view-source a:hover {
+  text-decoration: underline;
+}
