@@ -21,3 +21,4 @@ Check your [browser and platform implementation status](https://github.com/WebBl
 - [BB-8 Control](https://github.com/operasoftware/bb8) by [@operasoftware](https://github.com/operasoftware)
 - [Physical Web Light Switch](https://github.com/hardillb/physical-web-lightswitch) by [@hardillb](https://github.com/hardillb)
 - [purple-eye](https://github.com/urish/purple-eye) by [@urish](https://github.com/urish)
+- [Eddystone Beacon Configuration](https://beaufortfrancois.github.io/sandbox/web-bluetooth/eddystone-url-config/index.html) by [@beaufortfrancois](https://github.com/beaufortfrancois)    
