@@ -1,6 +1,5 @@
 self.addEventListener('fetch', function(event) {
   const request = event.request;
-  const url = new URL(event.request.url)
 
   event.respondWith(
    caches.open('playbulb-candle').then(cache => {
@@ -9,10 +8,6 @@ self.addEventListener('fetch', function(event) {
           cache.put(request, networkResponse.clone());
           return networkResponse;
         });
-        // We need to ensure that the event doesn't complete until we
-        // know we have fetched the data
-        event.waitUntil(fetchPromise);
-
         // Return the response from cache or wait for network.
         return response || fetchPromise;
       })
