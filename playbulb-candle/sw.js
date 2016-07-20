@@ -8,6 +8,10 @@ self.addEventListener('fetch', function(event) {
           cache.put(request, networkResponse.clone());
           return networkResponse;
         });
+        // We need to ensure that the event doesn't complete until we
+        // know we have fetched the data
+        event.waitUntil(fetchPromise);
+
         // Return the response from cache or wait for network.
         return response || fetchPromise;
       })
@@ -23,6 +27,6 @@ self.addEventListener('activate', function(event) {
         cacheNames.filter(cacheName => (cacheName !== 'playbulb-candle'))
                   .map(cacheName => caches.delete(cacheName))
       );
-    });
+    })
   );
 });
