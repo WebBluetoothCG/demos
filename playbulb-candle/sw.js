@@ -1,20 +1,15 @@
 self.addEventListener('fetch', function(event) {
-  const request = event.request;
-
   event.respondWith(
-   caches.open('playbulb-candle').then(cache => {
-      return cache.match(request).then(response => {
-        var fetchPromise = fetch(request).then(networkResponse => {
-          cache.put(request, networkResponse.clone());
-          return networkResponse;
-        });
-        // We need to ensure that the event doesn't complete until we
-        // know we have fetched the data
-        event.waitUntil(fetchPromise);
+    caches.open('playbulb-candle').then(cache => {
+      return cache.match(event.request).then(response => {
 
-        // Return the response from cache or wait for network.
-        return response || fetchPromise;
-      })
+        // If a request doesn't match anything in the cache, get it from the
+        // network, send it to the page & add it to the cache at the same time.
+        return response || fetch(event.request).then(response => {
+          cache.put(event.request, response.clone());
+          return response;
+        });
+      });
     })
   );
 });
