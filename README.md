@@ -23,3 +23,7 @@ Check your [browser and platform implementation status](https://github.com/WebBl
 - [purple-eye](https://github.com/urish/purple-eye) by [@urish](https://github.com/urish)
 - [Eddystone Beacon Configuration](https://beaufortfrancois.github.io/sandbox/web-bluetooth/eddystone-url-config/index.html) by [@beaufortfrancois](https://github.com/beaufortfrancois)
 - [webble-mip](https://github.com/urish/webble-mip) by [@urish](https://github.com/urish) 
+- [MakeBlock mBot Robot](https://github.com/binomed/mbot-webbluetooth) by [@binomed](https://github.com/binomed)
+- [Remote Lego project](https://github.com/devmil/remotelego) by [@devmil](https://github.com/devmil)
+- [nrf52-Quadcopter](https://github.com/NordicSemiconductor/nrf52-quadcopter) by [@NordicSemiconductor](https://github.com/NordicSemiconductor)
+- [Sphero Ollie Robot](https://github.com/binomed/sphero_ollie-web-bluetooth) by [@binomed](https://github.com/binomed)
