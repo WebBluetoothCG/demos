@@ -1,28 +1,25 @@
 function addToCache(request, networkResponse) {
   return caches.open('playbulb-candle')
-    .then((cache) => cache.put(request, networkResponse.clone()));
+    .then(cache => cache.put(request, networkResponse.clone()));
 }
 
 function getCacheResponse(request) {
-  return caches.open('playbulb-candle').then((cache) => {
+  return caches.open('playbulb-candle').then(cache => {
     return cache.match(request);
   });
 }
 
 function getNetworkOrCacheResponse(request) {
-  return new Promise((resolve) => {
-    fetch(request).then((networkResponse) => {
-      addToCache(request, networkResponse);
-      resolve(networkResponse);
-    }).catch(() => {
-      getCacheResponse(request).then((cacheResponse) => {
-        resolve(cacheResponse || Response.error());
-      });
-    });
+  return fetch(request).then(networkResponse => {
+    addToCache(request, networkResponse);
+    return networkResponse;
+  }).catch(_ => {
+    return getCacheResponse(request)
+      .then(cacheResponse => cacheResponse || Response.error());
   });
 }
 
-self.addEventListener('fetch', (event) => {
+self.addEventListener('fetch', event => {
   event.respondWith(getNetworkOrCacheResponse(event.request));
 });
 
@@ -35,6 +32,6 @@ function cleanOldCache() {
   })
 }
 
-self.addEventListener('activate', (event) => {
+self.addEventListener('activate', event => {
   event.waitUntil(cleanOldCache());
 });
