@@ -28,3 +28,4 @@ Check your [browser and platform implementation status](https://github.com/WebBl
 - [nrf52-Quadcopter](https://github.com/NordicSemiconductor/nrf52-quadcopter) by [@NordicSemiconductor](https://github.com/NordicSemiconductor)
 - [Sphero Ollie Robot](https://github.com/binomed/sphero_ollie-web-bluetooth) by [@binomed](https://github.com/binomed)
 - [Smart Bluetooth Bulb](https://github.com/urish/web-lightbulb) by [@urish](https://github.com/urish)
+- [bleno Pizza Builder](https://github.com/strangesast/bleno-web-pizza-example) by [@strangesast](https://github.com/strangesast)
