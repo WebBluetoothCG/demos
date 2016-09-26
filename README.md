@@ -29,3 +29,4 @@ Check your [browser and platform implementation status](https://github.com/WebBl
 - [Sphero Ollie Robot](https://github.com/binomed/sphero_ollie-web-bluetooth) by [@binomed](https://github.com/binomed)
 - [Smart Bluetooth Bulb](https://github.com/urish/web-lightbulb) by [@urish](https://github.com/urish)
 - [bleno Pizza Builder](https://github.com/strangesast/bleno-web-pizza-example) by [@strangesast](https://github.com/strangesast)
+- [ReactJS Heart Rate Monitor](https://github.com/yossi-eynav/ble-heart-rate-demo) by [@yossi-eynav](https://github.com/yossi-eynav)
