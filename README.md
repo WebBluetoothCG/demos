@@ -30,3 +30,4 @@ Check your [browser and platform implementation status](https://github.com/WebBl
 - [Smart Bluetooth Bulb](https://github.com/urish/web-lightbulb) by [@urish](https://github.com/urish)
 - [bleno Pizza Builder](https://github.com/strangesast/bleno-web-pizza-example) by [@strangesast](https://github.com/strangesast)
 - [ReactJS Heart Rate Monitor](https://github.com/yossi-eynav/ble-heart-rate-demo) by [@yossi-eynav](https://github.com/yossi-eynav)
+- [Lend me your ears!](https://github.com/lachendeKatze/relay-click) by [@lachendeKatze](https://github.com/lachendeKatze)
