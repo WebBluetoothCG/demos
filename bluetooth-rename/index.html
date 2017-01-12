@@ -144,14 +144,6 @@ limitations under the License.
           writeNameButton.disabled = false;
         }
 
-        function anyDeviceFilter() {
-          // This is the closest we can get for now to get all devices.
-          // https://github.com/WebBluetoothCG/web-bluetooth/issues/234
-          return Array.from('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
-              .map(c => ({namePrefix: c}))
-              .concat({name: ''});
-        }
-
         connectButton.addEventListener('click', function () {
           progress.hidden = false;
           disableInput();
@@ -161,7 +153,7 @@ limitations under the License.
               throw "No Web Bluetooth support.";
 
             return navigator.bluetooth.requestDevice({
-              filters: anyDeviceFilter(),
+              acceptAllDevices:true,
               optionalServices: ['generic_access']
             })
           })
