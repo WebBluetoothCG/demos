@@ -153,6 +153,7 @@ limitations under the License.
               throw "No Web Bluetooth support.";
 
             return navigator.bluetooth.requestDevice({
+              // filters: [...] <- Prefer filters to save energy & show relevant devices.
               acceptAllDevices:true,
               optionalServices: ['generic_access']
             })
