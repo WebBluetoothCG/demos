@@ -32,3 +32,4 @@ Check your [browser and platform implementation status](https://github.com/WebBl
 - [ReactJS Heart Rate Monitor](https://github.com/yossi-eynav/ble-heart-rate-demo) by [@yossi-eynav](https://github.com/yossi-eynav)
 - [Lend me your ears!](https://github.com/lachendeKatze/relay-click) by [@lachendeKatze](https://github.com/lachendeKatze)
 - [Rowing Monitor](https://github.com/GoogleChrome/rowing-monitor) by [@andreban](https://github.com/andreban)
+- [SBrick Web Controller](https://github.com/360fun/SBrick-Web-Controller) by [@360fun](https://github.com/360fun)
