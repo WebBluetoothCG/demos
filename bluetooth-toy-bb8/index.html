@@ -135,7 +135,7 @@ limitations under the License.
         </paper-dialog>
       </div>
 
-      <div id="retrostick" class="retrostick">
+      <!-- <div id="retrostick" class="retrostick">
         <div class="retrostick-base">
 
           <div class="retrostick-base-joint">
@@ -156,9 +156,11 @@ limitations under the License.
           <span class="retrostick-dir-note retrostick-dir-backward">backward</span>
           <span class="retrostick-dir-note retrostick-dir-backward-right">right</span>
 
-        </div>
+        </div> -->
       </div>
     </template>
+    <audio id="soundFile" class="hideIfNoApi" src="song.mp3"></audio>
+    <button id="play-but">Play/Pause</button>
 
     <script>
       'use strict';
@@ -176,6 +178,8 @@ limitations under the License.
         let heading = 0;
         let busy = false;
         progress.hidden = true;
+
+        let coreHeading;
 
         if (navigator.bluetooth == undefined) {
           document.getElementById("no-bluetooth").open();
@@ -217,12 +221,48 @@ limitations under the License.
           array.set(packets, 0);
           array.set(data, packets.byteLength);
           array.set(checksum, packets.byteLength + data.byteLength);
+          console.log('Sending', array);
           return controlCharacteristic.writeValue(array).then(() => {
             console.log('Command write done.');
           });
         }
 
-        function setColor(r, g, b) {
+        window.setBackLEDBrightness = function (brightness) {
+          console.log('Set brightness: brightness='+brightness);
+          if (busy) {
+            // Return if another operation pending
+            return Promise.resolve();
+          }
+          busy = true;
+          let did = 0x02; // Virtual device ID
+          let cid = 0x21; // Set RGB LED Output command
+          // Color command data: red, green, blue, flag
+          let data = new Uint8Array([brightness]);
+
+          sendCommand(did, cid, data).then(() => {
+            busy = false;
+          })
+          .catch(handleError);
+        }
+
+        window.setRotationRate = function (rate) {
+          console.log('Set rotation rate: rate='+rate);
+          if (busy) {
+            // Return if another operation pending
+            return Promise.resolve();
+          }
+          busy = true;
+          let did = 0x02; // Virtual device ID
+          let cid = 0x03; // Set Rotation Rate command
+          let data = new Uint8Array([rate]);
+
+          sendCommand(did, cid, data).then(() => {
+            busy = false;
+          })
+          .catch(handleError);
+        }
+
+        window.setColor = function (r, g, b) {
           console.log('Set color: r='+r+',g='+g+',b='+b);
           if (busy) {
             // Return if another operation pending
@@ -240,8 +280,28 @@ limitations under the License.
           .catch(handleError);
         }
 
-        function roll(heading) {
+        window.roll = function (heading, speed, state) {
+          if(!speed) speed = 10;
+          if(!state) state = 1;
           console.log('Roll heading='+heading);
+          if (busy) {
+            // Return if another operation pending
+            return Promise.resolve();
+          }
+          coreHeading = heading;
+          busy = true;
+          let did = 0x02; // Virtual device ID
+          let cid = 0x30; // Roll command
+          // Roll command data: speed, heading (MSB), heading (LSB), state
+          let data = new Uint8Array([speed, heading >> 8, heading & 0xFF, 1]);
+
+          sendCommand(did, cid, data).then(() => {
+            busy = false;
+          })
+          .catch(handleError);
+        }
+
+         window.stopRolling = function () {
           if (busy) {
             // Return if another operation pending
             return Promise.resolve();
@@ -250,7 +310,45 @@ limitations under the License.
           let did = 0x02; // Virtual device ID
           let cid = 0x30; // Roll command
           // Roll command data: speed, heading (MSB), heading (LSB), state
-          let data = new Uint8Array([10, heading >> 8, heading & 0xFF, 1]);
+          let data = new Uint8Array([100, coreHeading >> 8, coreHeading & 0xFF, 0]);
+
+          sendCommand(did, cid, data).then(() => {
+            busy = false;
+          })
+          .catch(handleError);
+        }
+
+        window.stabilization = function (status) {
+          console.log('stabilization status='+status);
+          if (busy) {
+            // Return if another operation pending
+            return Promise.resolve();
+          }
+          busy = true;
+          let did = 0x02; // Virtual device ID
+          let cid = 0x02; // Stabilization command
+          // Heading command data: status
+          let data = new Uint8Array([status]);
+
+          sendCommand(did, cid, data).then(() => {
+            busy = false;
+          })
+          .catch(handleError);
+        }
+
+        window.setHeading = function (heading) {
+          console.log('heading='+heading);
+          if (busy) {
+            // Return if another operation pending
+            return Promise.resolve();
+          }
+          coreHeading = heading;
+          busy = true;
+          let did = 0x02; // Virtual device ID
+          let cid = 0x01; // Heading command
+          // Heading command data: heading
+          let data = new Uint16Array([heading]);
+          //console.log('made new DATA array', data);
 
           sendCommand(did, cid, data).then(() => {
             busy = false;
@@ -338,16 +436,171 @@ limitations under the License.
             .catch(handleError);
           } else {
             progress.hidden = true;
-            setColor(0, 250, 0);
+            setColor(250, 0, 0);
           }
         });
 
-        let joystick = new RetroJoyStick({
-          retroStickElement: document.querySelector('#retrostick')
-        });
-        joystick.subscribe('change', stick => {
-          roll(stick.angle);
-        });
+        // let joystick = new RetroJoyStick({
+        //   retroStickElement: document.querySelector('#retrostick')
+        // });
+        // joystick.subscribe('change', stick => {
+        //   roll(stick.angle);
+        // });
+
+        //Audio Pitch Detection utilising work from https://github.com/cwilso/PitchDetect
+
+        var MIN_SAMPLES = 0;  // will be initialized when AudioContext is created.
+
+        //Audio stuff---------------------------------------------
+        var contextClass = (window.AudioContext || window.webkitAudioContext);
+        //for sound to be passed into
+        var audioBuffer;
+        //for analyser node
+        var analyser;
+        //set empty array hald of fft size or equal to frequencybincount (you could put frequency bin count here if created)
+        var frequencyData = new Uint8Array(1024);
+        if (contextClass) {
+          // Web Audio API is available.
+          var audioContext = new contextClass();
+        } else {
+          // Web Audio API is not available. Ask the user to use a supported browser.
+          alert("Oh no! It appears your browser does not support the Web Audio API, please upgrade or use a different browser");
+        }
+        //load audio file from html tag
+        var audioElement = document.getElementById('soundFile');
+        //creating source node
+        var source = audioContext.createMediaElementSource(audioElement);
+        function createAnalyser() {
+          //create analyser node
+          analyser = audioContext.createAnalyser();
+          //set size of how many bits we analyse on
+          analyser.fftSize = 2048;
+        }
+        function connectAnalyser(source) {
+          //connect to source
+          source.connect(analyser);
+          //pipe to speakers
+          analyser.connect(audioContext.destination);
+        }
+        function playSound() {
+          //passing in file
+          //source.buffer = audioBuffer;
+          createAnalyser();
+          //creating source node
+          connectAnalyser(source);
+          //start playing
+          audioElement.play();
+        }
+        function audioIsPlaying(audioElement) {
+          return audioElement.paused;
+        }
+        function playButton(){
+          if (audioIsPlaying(audioElement)) {
+            playSound();
+            update();
+          } else {
+            audioElement.pause();
+          }
+        }
+        //play sound
+        document.getElementById('play-but').onclick = function(){
+          playButton();
+        }
+
+        var buf = new Float32Array( 1024 );
+        var noteStrings = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+
+        function autoCorrelate( buf, sampleRate ) {
+          var SIZE = buf.length;
+          var MAX_SAMPLES = Math.floor(SIZE/2);
+          var best_offset = -1;
+          var best_correlation = 0;
+          var rms = 0;
+          var foundGoodCorrelation = false;
+          var correlations = new Array(MAX_SAMPLES);
+
+          for (var i=0;i<SIZE;i++) {
+            var val = buf[i];
+            rms += val*val;
+          }
+          rms = Math.sqrt(rms/SIZE);
+          if (rms<0.01) // not enough signal
+            return -1;
+
+          var lastCorrelation=1;
+          for (var offset = MIN_SAMPLES; offset < MAX_SAMPLES; offset++) {
+            var correlation = 0;
+
+            for (var i=0; i<MAX_SAMPLES; i++) {
+              correlation += Math.abs((buf[i])-(buf[i+offset]));
+            }
+            correlation = 1 - (correlation/MAX_SAMPLES);
+            correlations[offset] = correlation; // store it, for the tweaking we need to do below.
+            if ((correlation>0.9) && (correlation > lastCorrelation)) {
+              foundGoodCorrelation = true;
+              if (correlation > best_correlation) {
+                best_correlation = correlation;
+                best_offset = offset;
+              }
+            } else if (foundGoodCorrelation) {
+              // short-circuit - we found a good correlation, then a bad one, so we'd just be seeing copies from here.
+              // Now we need to tweak the offset - by interpolating between the values to the left and right of the
+              // best offset, and shifting it a bit.  This is complex, and HACKY in this code (happy to take PRs!) -
+              // we need to do a curve fit on correlations[] around best_offset in order to better determine precise
+              // (anti-aliased) offset.
+
+              // we know best_offset >=1,
+              // since foundGoodCorrelation cannot go to true until the second pass (offset=1), and
+              // we can't drop into this clause until the following pass (else if).
+              var shift = (correlations[best_offset+1] - correlations[best_offset-1])/correlations[best_offset];
+              return sampleRate/(best_offset+(8*shift));
+            }
+            lastCorrelation = correlation;
+          }
+          if (best_correlation > 0.01) {
+            // console.log("f = " + sampleRate/best_offset + "Hz (rms: " + rms + " confidence: " + best_correlation + ")")
+            return sampleRate/best_offset;
+          }
+          return -1;
+        //  var best_frequency = sampleRate/best_offset;
+        }
+
+        function noteFromPitch( frequency ) {
+          var noteNum = 12 * (Math.log( frequency / 440 )/Math.log(2) );
+          return Math.round( noteNum ) + 69;
+        }
+
+        var red = true;
+
+        function update() {
+          requestIdleCallback(update);
+          //constantly getting feedback from data
+
+          var cycles = new Array;
+          analyser.getFloatTimeDomainData( buf );
+          var ac = autoCorrelate( buf, audioContext.sampleRate );
+          var note = noteFromPitch( ac );
+
+          if(ac !== -1){
+            console.log(noteStrings[note%12]);
+          }
+
+          if(ac !== -1 && noteStrings[note%12] === 'G') {
+            if (red) {
+              red = false;
+              setColor(0, 0, 250)
+              setTimeout(function(){
+                roll(180, 0, 0)
+              }, 50);
+            } else {
+              red = true;
+              setColor(250, 0, 0)
+              setTimeout(function(){
+                roll(90, 0, 0)
+              }, 50);
+            }
+          }
+        };
       });
     </script>
   </body>
