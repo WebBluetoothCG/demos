@@ -33,3 +33,8 @@ Check your [browser and platform implementation status](https://github.com/WebBl
 - [Lend me your ears!](https://github.com/lachendeKatze/relay-click) by [@lachendeKatze](https://github.com/lachendeKatze)
 - [Rowing Monitor](https://github.com/GoogleChrome/rowing-monitor) by [@andreban](https://github.com/andreban)
 - [SBrick Web Controller](https://github.com/360fun/SBrick-Web-Controller) by [@360fun](https://github.com/360fun)
+- [Walk the Lexington Battle Road](https://www.youtube.com/watch?v=O7KF0-aVvl8) ([article](https://developer.telerik.com/content-types/tutorials/get-ready-web-bluetooth/)) by [@jlooper](https://github.com/jlooper)
+- [Update device firmware via Nordic's DFU](https://github.com/thegecko/web-bluetooth-dfu/) by [@thegecko](https://github.com/thegecko)
+- [Nordic Thingy:52 Web App](https://github.com/NordicSemiconductor/webapp-nordic-thingy) by [@NordicSemiconductor](https://github.com/NordicSemiconductor)
+- [BLE Keyboard & Mouse Dongle](https://github.com/DeqingSun/BLE-Keyboard-Mouse-Dongle) by [@DeqingSun](https://github.com/DeqingSun)
+- [Connect to the Myo armband](https://github.com/charliegerard/myo-web-bluetooth.js) by [@charliegerard](https://github.com/charliegerard)
