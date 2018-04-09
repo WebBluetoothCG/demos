@@ -248,7 +248,7 @@ limitations under the License.
           if (printCharacteristic == null) {
             navigator.bluetooth.requestDevice({
               filters: [{
-                services: ['000018f0-0000-1000-8000-00805f9b34fb']
+                services: ['00001101-0000-1000-8000-00805f9b34fb']
               }]
             })
             .then(device => {
@@ -256,7 +256,7 @@ limitations under the License.
               console.log('Connecting to GATT Server...');
               return device.gatt.connect();
             })
-            .then(server => server.getPrimaryService("000018f0-0000-1000-8000-00805f9b34fb"))
+            .then(server => server.getPrimaryService("00001101-0000-1000-8000-00805f9b34fb"))
             .then(service => service.getCharacteristic("00002af1-0000-1000-8000-00805f9b34fb"))
             .then(characteristic => {
               // Cache the characteristic
