@@ -40,3 +40,4 @@ Check your [browser and platform implementation status](https://github.com/WebBl
 - [BLE Keyboard & Mouse Dongle](https://github.com/DeqingSun/BLE-Keyboard-Mouse-Dongle) by [@DeqingSun](https://github.com/DeqingSun)
 - [Connect to the Myo armband](https://github.com/charliegerard/myo-web-bluetooth.js) by [@charliegerard](https://github.com/charliegerard)
 - [Mercedes-Benz car emulator demo](https://www.youtube.com/watch?v=97MlLkfLVf0) by [Mercedes-Benz Digital Challenge](http://www.mercedes-benz-challenge.com/)
+try the api to print when using Thermal Mini Printer
