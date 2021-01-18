@@ -15,6 +15,7 @@ Check your [browser and platform implementation status](https://github.com/WebBl
 
 ### Hosted Elsewhere
 
+- [Chrome's Web Bluetooth Samples](https://googlechrome.github.io/samples/web-bluetooth/index.html) by [@beaufortfrancois](https://github.com/beaufortfrancois) and [others](https://github.com/GoogleChrome/samples/commits/gh-pages/web-bluetooth).
 - [CoolBeans for Node.js](https://github.com/monteslu/coolbeans) by [@monteslu](https://github.com/monteslu)
 - [BB-8 Controlled via Web Bluetooth and Web Audio](https://nimbleape.github.io/demos/bluetooth-toy-bb8/) by [@nimbleape](https://github.com/nimbleape)
 - [Parrot Mini Drone Controller](https://github.com/poshaughnessy/web-bluetooth-parrot-drone) by [@poshaughnessy](https://github.com/poshaughnessy)
