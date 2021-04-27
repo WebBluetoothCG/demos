@@ -15,35 +15,15 @@
       })
       .then(server => {
         this.server = server;
-        return Promise.all([
-          server.getPrimaryService('heart_rate').then(service => {
-            return Promise.all([
-              this._cacheCharacteristic(service, 'body_sensor_location'),
-              this._cacheCharacteristic(service, 'heart_rate_measurement'),
-            ])
-          })
-        ]);
+        return server.getPrimaryService('heart_rate');
+      })
+      .then(service => {
+        return this._cacheCharacteristic(service, 'heart_rate_measurement');
       })
     }
 
     /* Heart Rate Service */
 
-    getBodySensorLocation() {
-      return this._readCharacteristicValue('body_sensor_location')
-      .then(data => {
-        let sensorLocation = data.getUint8(0);
-        switch (sensorLocation) {
-          case 0: return 'Other';
-          case 1: return 'Chest';
-          case 2: return 'Wrist';
-          case 3: return 'Finger';
-          case 4: return 'Hand';
-          case 5: return 'Ear Lobe';
-          case 6: return 'Foot';
-          default: return 'Unknown';
-        }
-     });
-    }
     startNotificationsHeartRateMeasurement() {
       return this._startNotifications('heart_rate_measurement');
     }
