@@ -15,13 +15,10 @@
       })
       .then(server => {
         this.server = server;
-        return Promise.all([
-          server.getPrimaryService('heart_rate').then(service => {
-            return Promise.all([
-              this._cacheCharacteristic(service, 'heart_rate_measurement'),
-            ])
-          })
-        ]);
+        return server.getPrimaryService('heart_rate');
+      })
+      .then(service => {
+        return this._cacheCharacteristic(service, 'heart_rate_measurement');
       })
     }
 
