@@ -42,3 +42,4 @@ Check your [browser and platform implementation status](https://github.com/WebBl
 - [Connect to the Myo armband](https://github.com/charliegerard/myo-web-bluetooth.js) by [@charliegerard](https://github.com/charliegerard)
 - [Mercedes-Benz car emulator demo](https://www.youtube.com/watch?v=97MlLkfLVf0) by [Mercedes-Benz Digital Challenge](http://www.mercedes-benz-challenge.com/)
 - [Connect to BBC micro:bit](https://github.com/ngammarano/microbit-web-bluetooth) by [@ngammarano](https://github.com/ngammarano)
+- [Flux indoor cycling app](https://github.com/dvmarinoff/Flux) by [@dvmarinoff](https://github.com/dvmarinoff)
